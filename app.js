@@ -6,13 +6,13 @@
 const WORKER_API_BASE = "https://notion-worker.q936677.workers.dev/api/student-dashboard";
 const CIRCUMFERENCE = 175.93; // 2 * PI * 28
 
-// State definition (starts clean with no mock tasks!)
+// State definition
 const state = {
   name: "조재환",
   streak: 0,
   reward: 0,
   targetReward: 5000,
-  tasks: [], // 빈 배열로 시작하여 깜빡임/가짜숙제 노출 원천 차단!
+  tasks: [],
   cumulativeRate: 0,
   cumulativeDone: 0,
   cumulativeTotal: 0,
@@ -47,11 +47,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function fetchLiveNotionData(studentName, urlParams) {
   try {
     setLoadingState(true);
-    // 캐시 방지 파라미터 & no-store 헤더로 실시간 데이터 보장
-    const res = await fetch(`${WORKER_API_BASE}?name=${encodeURIComponent(studentName)}&_t=${Date.now()}`, {
-      cache: "no-store",
-      headers: { "Cache-Control": "no-cache", "Pragma": "no-cache" }
-    });
+    // Simple GET request with timestamp _t for zero-cache & guaranteed CORS safety
+    const res = await fetch(`${WORKER_API_BASE}?name=${encodeURIComponent(studentName)}&_t=${Date.now()}`);
     const json = await res.json();
 
     if (json.success && json.data) {
@@ -72,7 +69,7 @@ async function fetchLiveNotionData(studentName, urlParams) {
       // 최근 수업에 연결된 실제 집숙제 목록
       state.tasks = Array.isArray(live.tasks) ? live.tasks : [];
 
-      // URL 파라미터로 명시적 오버라이드한 값이 있으면 반영
+      // URL 파라미터 오버라이드 지원
       if (urlParams.has("reward")) state.reward = parseInt(urlParams.get("reward"), 10) || state.reward;
       if (urlParams.has("target")) state.targetReward = parseInt(urlParams.get("target"), 10) || state.targetReward;
       if (urlParams.has("streak")) state.streak = parseInt(urlParams.get("streak"), 10) || state.streak;
@@ -173,7 +170,7 @@ function renderChecklist() {
     return;
   }
 
-  // 로딩 끝났는데 숙제가 없을 때
+  // 로딩 완료 후 숙제가 0개일 때
   if (!state.isLoading && state.tasks.length === 0) {
     container.innerHTML = '<div class="task-loading-placeholder">최근 수업에 부여된 집숙제가 없습니다 🎉</div>';
     updateInspectionBanner();
@@ -199,7 +196,7 @@ function renderChecklist() {
       </span>
     `;
 
-    // 학생 체크 클릭 이벤트 (로컬 화면에서만 토글되고 노션 DB는 건드리지 않음!)
+    // 학생 체크 클릭 이벤트 (로컬 화면에서만 토글)
     itemEl.addEventListener("click", () => {
       toggleTask(task.id);
     });
@@ -212,7 +209,7 @@ function renderChecklist() {
 }
 
 /**
- * 5. Toggle Task State (로컬 전용 토글 - 노션 실시간 연동 제거)
+ * 5. Toggle Task State (로컬 전용 토글)
  */
 function toggleTask(taskId) {
   const task = state.tasks.find(t => t.id === taskId);
@@ -233,12 +230,23 @@ function toggleTask(taskId) {
  * 6. Update Banner Text & Style based on Completion
  */
 function updateInspectionBanner() {
-  const allDone = state.tasks.length > 0 && state.tasks.every(t => t.done);
   const banner = document.getElementById("inspectionBanner");
   const title = document.getElementById("bannerTitle");
   const sub = document.getElementById("bannerSub");
   const emoji = document.getElementById("bannerEmoji");
 
+  // 1. 숙제가 없을 때
+  if (state.tasks.length === 0) {
+    emoji.textContent = "☕";
+    title.textContent = "오늘 숙제 없음";
+    sub.innerHTML = "최근 수업에 부여된 집숙제가 없습니다.<br>편안하고 즐거운 하루 보내세요! ✨";
+    banner.style.borderColor = "rgba(16, 185, 129, 0.4)";
+    banner.style.background = "rgba(12, 36, 24, 0.85)";
+    return;
+  }
+
+  // 2. 숙제가 있고 100% 완료했을 때
+  const allDone = state.tasks.length > 0 && state.tasks.every(t => t.done);
   if (allDone) {
     emoji.textContent = "🎉";
     title.textContent = "오늘 과제 100% 완료!";
@@ -246,6 +254,7 @@ function updateInspectionBanner() {
     banner.style.borderColor = "#eab308";
     banner.style.background = "rgba(36, 28, 12, 0.85)";
   } else {
+    // 3. 숙제가 있고 아직 진행 중일 때
     emoji.textContent = "📝";
     title.textContent = "오늘 과제 진행 중!";
     sub.innerHTML = `과제를 모두 체크하면 축하 폭죽과 함께 <br>선생님 검사 대기 모드로 전환됩니다! 🪙`;
