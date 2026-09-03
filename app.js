@@ -30,6 +30,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     lucide.createIcons();
   }
 
+  
+  // 혹시 노션 임베드 캐시로 남아있는 톱니바퀴/모달 DOM 강제 즉시 삭제
+  const lingeringGear = document.getElementById("openSettingsBtn");
+  if (lingeringGear) lingeringGear.remove();
+  const lingeringModal = document.getElementById("settingsModal");
+  if (lingeringModal) lingeringModal.remove();
+
   // 1. Initial local render
   parseUrlParams();
   renderDashboard();

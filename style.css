@@ -493,3 +493,13 @@ body {
     margin-bottom: 6px;
   }
 }
+
+/* 완전히 제거된 톱니바퀴 및 모달 - 캐시된 노션 임베드에서도 강제 숨김 */
+.settings-gear-btn, #openSettingsBtn, .modal-backdrop, #settingsModal {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
