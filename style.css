@@ -640,3 +640,72 @@ body {
     grid-column: span 1;
   }
 }
+
+/* Student Name Tag on Card Header */
+.student-name-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  color: #93c5fd;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-right: 4px;
+}
+
+.pill-sync {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.checklist-hint {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+/* Quick Student Chips */
+.quick-student-select-box {
+  margin-bottom: 16px;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.quick-student-select-box label {
+  display: block;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+}
+.student-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip-btn {
+  background: rgba(30, 41, 59, 0.8);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chip-btn:hover {
+  background: #2563eb;
+  color: white;
+  border-color: #3b82f6;
+}
+.chip-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #60a5fa;
+  font-weight: 700;
+}

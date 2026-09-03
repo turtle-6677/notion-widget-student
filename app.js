@@ -6,9 +6,9 @@
 const WORKER_API_BASE = "https://notion-worker.q936677.workers.dev/api/student-dashboard";
 const CIRCUMFERENCE = 175.93; // 2 * PI * 28
 
-// State definition (starts with default/fallback data, updated via Notion API)
+// State definition
 const state = {
-  name: "김철수",
+  name: "조재환",
   streak: 7,
   reward: 3400,
   targetReward: 5000,
@@ -26,6 +26,7 @@ const state = {
   attTotal: 20,
   progress: 72,
   progChapter: "Chapter 8",
+  isLiveSync: false,
   isLoading: false
 };
 
@@ -34,15 +35,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     lucide.createIcons();
   }
 
-  // 1. Initial local render with default or URL params
+  // 1. Initial local render
   parseUrlParams();
   renderDashboard();
   setupEvents();
 
   // 2. If student 'name' is in URL, fetch live data from Notion DB via Cloudflare Worker!
   const params = new URLSearchParams(window.location.search);
-  if (params.has("name") && params.get("name").trim() !== "") {
-    await fetchLiveNotionData(params.get("name").trim(), params);
+  const targetName = params.get("name") ? params.get("name").trim() : "";
+
+  if (targetName) {
+    await fetchLiveNotionData(targetName, params);
+  } else {
+    // If no name specified in URL, try fetching the first student '조재환' so it works out of the box!
+    console.log("No ?name specified in URL, loading default student '조재환' from Notion DB...");
+    await fetchLiveNotionData("조재환", params);
   }
 });
 
@@ -69,6 +76,7 @@ async function fetchLiveNotionData(studentName, urlParams) {
       state.cumulativeTotal = live.cumulativeTotal;
       state.targetReward = live.targetReward;
       state.reward = live.reward;
+      state.isLiveSync = true;
 
       if (Array.isArray(live.tasks) && live.tasks.length > 0) {
         state.tasks = live.tasks;
@@ -85,9 +93,13 @@ async function fetchLiveNotionData(studentName, urlParams) {
       renderDashboard();
     } else {
       console.warn("Notion data notice:", json.error);
+      state.isLiveSync = false;
+      renderDashboard();
     }
   } catch (err) {
     console.error("Failed to connect to Notion backend:", err);
+    state.isLiveSync = false;
+    renderDashboard();
   } finally {
     setLoadingState(false);
   }
@@ -108,7 +120,7 @@ function setLoadingState(loading) {
 }
 
 /**
- * 2. Parse URL Parameters (for offline or custom override use)
+ * 2. Parse URL Parameters
  */
 function parseUrlParams() {
   const params = new URLSearchParams(window.location.search);
@@ -136,6 +148,23 @@ function parseUrlParams() {
  * 3. Render Full Dashboard UI
  */
 function renderDashboard() {
+  // Update Student Name Tag & Live Sync Badge
+  const studentTag = document.getElementById("studentNameTag");
+  if (studentTag) {
+    studentTag.textContent = `🧑‍🎓 ${state.name}`;
+  }
+
+  const syncBadge = document.getElementById("syncStatusBadge");
+  if (syncBadge) {
+    if (state.isLiveSync) {
+      syncBadge.textContent = "🟢 Notion DB 실시간 연동";
+      syncBadge.className = "badge-pill pill-sync";
+    } else {
+      syncBadge.textContent = "⚡ 데모 모드";
+      syncBadge.className = "badge-pill";
+    }
+  }
+
   // Row 1: Voucher Amounts & Progress
   const curFormatted = `₩${state.reward.toLocaleString()}`;
   const targetFormatted = `₩${state.targetReward.toLocaleString()}`;
@@ -307,9 +336,10 @@ function setupEvents() {
   const openBtn = document.getElementById("openSettingsBtn");
   const closeBtn = document.getElementById("closeSettingsBtn");
   const copyBtn = document.getElementById("copyUrlBtn");
+  const nameInput = document.getElementById("cfgName");
 
   openBtn.addEventListener("click", () => {
-    populateModal();
+    nameInput.value = state.name;
     generateEmbedUrl();
     modal.classList.add("show");
   });
@@ -322,9 +352,20 @@ function setupEvents() {
     if (e.target === modal) modal.classList.remove("show");
   });
 
-  const inputs = modal.querySelectorAll("input");
-  inputs.forEach(input => {
-    input.addEventListener("input", generateEmbedUrl);
+  nameInput.addEventListener("input", () => {
+    generateEmbedUrl();
+  });
+
+  // Student chips click handler
+  const chipButtons = document.querySelectorAll(".chip-btn");
+  chipButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      chipButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const student = btn.getAttribute("data-student");
+      nameInput.value = student;
+      generateEmbedUrl();
+    });
   });
 
   copyBtn.addEventListener("click", () => {
@@ -341,25 +382,9 @@ function setupEvents() {
   });
 }
 
-function populateModal() {
-  document.getElementById("cfgName").value = state.name;
-  document.getElementById("cfgStreak").value = state.streak;
-  document.getElementById("cfgReward").value = state.reward;
-  document.getElementById("cfgTarget").value = state.targetReward;
-  document.getElementById("cfgAtt").value = state.attendance;
-  document.getElementById("cfgProg").value = state.progress;
-  document.getElementById("cfgChapter").value = state.progChapter;
-  document.getElementById("cfgCRate").value = state.cumulativeRate;
-
-  const taskStr = state.tasks.map(t => `${t.text}:${t.done ? 1 : 0}`).join(", ");
-  document.getElementById("cfgTasks").value = taskStr;
-}
-
 function generateEmbedUrl() {
   const name = document.getElementById("cfgName").value.trim();
-  const baseUrl = window.location.origin + window.location.pathname;
-
-  // With live Notion DB sync, passing only '?name=학생이름' is enough!
+  const baseUrl = "https://turtle-6677.github.io/notion-widget-student/";
   const finalUrl = `${baseUrl}?name=${encodeURIComponent(name)}`;
   document.getElementById("embedUrlOutput").value = finalUrl;
 }

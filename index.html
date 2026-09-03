@@ -26,6 +26,7 @@
       <div class="voucher-header">
         <div class="voucher-title-wrap">
           <span class="voucher-icon">🏪</span>
+          <span class="student-name-tag" id="studentNameTag">🧑‍🎓 김철수</span>
           <span class="voucher-name">편의점 모바일 상품권</span>
           <span class="voucher-amounts">
             <span class="cur-reward" id="rewardCurrentText">₩3,400</span>
@@ -34,6 +35,7 @@
           </span>
         </div>
         <div class="voucher-tags">
+          <span class="badge-pill pill-sync" id="syncStatusBadge">⚡ Notion DB 연동</span>
           <span class="badge-pill pill-gold" id="pillCurrent">₩3,400</span>
           <span class="badge-pill pill-blue" id="pillTarget">₩5,000</span>
           <span class="badge-pill pill-streak" id="pillStreak">🔥 7회 연속 완수</span>
@@ -56,6 +58,7 @@
         <div class="checklist-header">
           <span class="checklist-icon">📝</span>
           <h2 class="checklist-title">오늘의 집숙제 체크리스트</h2>
+          <span class="checklist-hint" id="checklistHint">(체크 시 노션 DB 실시간 반영)</span>
         </div>
         <div class="task-list" id="taskList">
           <!-- Dynamically Rendered by JS -->
@@ -141,71 +144,54 @@
     </div>
   </div>
 
-  <!-- Teacher URL Generator Modal -->
+  <!-- Teacher URL Generator Modal with Quick Student Selector -->
   <div class="modal-backdrop" id="settingsModal">
     <div class="modal-card">
       <div class="modal-header">
         <div class="modal-title-row">
           <i data-lucide="sliders" class="modal-icon"></i>
-          <h3>학생 데이터 설정 & 노션 임베드 URL 생성</h3>
+          <h3>학생 선택 & 노션 DB 실시간 연동 URL 복사</h3>
         </div>
         <button class="close-btn" id="closeSettingsBtn"><i data-lucide="x"></i></button>
       </div>
 
       <div class="modal-body">
+        <div class="quick-student-select-box">
+          <label><strong>🧑‍🎓 노션 DB 등록 학생 선택 (클릭 시 URL 자동 생성):</strong></label>
+          <div class="student-chips" id="studentChips">
+            <button class="chip-btn" data-student="조재환">조재환</button>
+            <button class="chip-btn" data-student="이서준">이서준</button>
+            <button class="chip-btn" data-student="박민준">박민준</button>
+            <button class="chip-btn" data-student="김선우">김선우</button>
+            <button class="chip-btn" data-student="고준서">고준서</button>
+            <button class="chip-btn" data-student="최준혁">최준혁</button>
+            <button class="chip-btn" data-student="신예은">신예은</button>
+            <button class="chip-btn" data-student="이서윤">이서윤</button>
+            <button class="chip-btn" data-student="김세윤">김세윤</button>
+          </div>
+        </div>
+
         <div class="input-grid">
-          <div class="input-group">
-            <label for="cfgName">학생 이름</label>
-            <input type="text" id="cfgName" value="김철수">
-          </div>
-          <div class="input-group">
-            <label for="cfgStreak">연속 완수일 (회)</label>
-            <input type="number" id="cfgStreak" value="7" min="0">
-          </div>
-          <div class="input-group">
-            <label for="cfgReward">현재 적립 금액 (원)</label>
-            <input type="number" id="cfgReward" value="3400" step="100" min="0">
-          </div>
-          <div class="input-group">
-            <label for="cfgTarget">목표 금액 (원)</label>
-            <input type="number" id="cfgTarget" value="5000" step="500" min="1000">
-          </div>
-          <div class="input-group">
-            <label for="cfgAtt">출석률 (%)</label>
-            <input type="number" id="cfgAtt" value="95" min="0" max="100">
-          </div>
-          <div class="input-group">
-            <label for="cfgProg">진도율 (%)</label>
-            <input type="number" id="cfgProg" value="72" min="0" max="100">
-          </div>
-          <div class="input-group">
-            <label for="cfgChapter">현재 진도 단원</label>
-            <input type="text" id="cfgChapter" value="Chapter 8">
-          </div>
-          <div class="input-group">
-            <label for="cfgCRate">누적 과제 성실도 (%)</label>
-            <input type="number" id="cfgCRate" value="94" min="0" max="100">
-          </div>
           <div class="input-group full-width">
-            <label for="cfgTasks">오늘의 집숙제 목록 (쉼표 , 로 구분 / 끝에 :1 붙이면 완료 표시)</label>
-            <input type="text" id="cfgTasks" value="수학 익힘책 p.45-47 풀기:1, 영어 단어 50개 암기:1, 과학 보고서 초안 작성:1, 국어 문제집 p.32 풀기:0">
+            <label for="cfgName">학생 이름 직접 입력</label>
+            <input type="text" id="cfgName" value="조재환" placeholder="노션 DB에 등록된 학생 이름 입력">
           </div>
         </div>
 
         <div class="url-output-section">
-          <label>생성된 노션 임베드용 URL</label>
+          <label>생성된 학생 맞춤 노션 임베드용 URL</label>
           <div class="copy-box">
             <input type="text" id="embedUrlOutput" readonly>
             <button class="copy-btn" id="copyUrlBtn">
               <i data-lucide="copy"></i> URL 복사
             </button>
           </div>
-          <p class="copy-hint">💡 이 주소를 복사한 뒤 노션 페이지에서 <code>/embed</code> 를 입력하고 붙여넣으세요!</p>
+          <p class="copy-hint">💡 이 주소를 복사한 뒤 해당 학생 노션 페이지의 <code>/embed</code> 에 붙여넣으세요!</p>
         </div>
       </div>
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=3.2"></script>
 </body>
 </html>
