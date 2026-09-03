@@ -115,10 +115,23 @@ body {
   gap: 3px;
 }
 
+.streaks-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
 .pill-streak {
   background: rgba(239, 68, 68, 0.18);
   color: #f87171;
   border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.pill-hw-streak {
+  background: rgba(168, 85, 247, 0.18);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.4);
 }
 
 /* Line 2: Convenience Store Voucher Title + Amounts */

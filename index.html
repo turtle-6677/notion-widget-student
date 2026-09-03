@@ -12,7 +12,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=6.0">
+  <link rel="stylesheet" href="style.css?v=7.0">
 </head>
 <body>
   <div class="dashboard-card" id="dashboardWidget">
@@ -23,10 +23,13 @@
 
     <!-- ROW 1: Convenience Store Mobile Voucher Header & Progress -->
     <div class="voucher-section">
-      <!-- Line 1: Student Name Tag & Streak Badge -->
+      <!-- Line 1: Student Name Tag & Dual Streaks (출석 + 숙제) -->
       <div class="header-line-student">
         <span class="student-name-tag" id="studentNameTag">🧑‍🎓 학생 로딩 중...</span>
-        <span class="badge-pill pill-streak" id="pillStreak">🔥 0회 연속 완수</span>
+        <div class="streaks-group">
+          <span class="badge-pill pill-streak" id="pillStreak">🔥 0회 연속 출석</span>
+          <span class="badge-pill pill-hw-streak" id="pillHwStreak">📝 0회 연속 완수</span>
+        </div>
       </div>
 
       <!-- Line 2: Convenience Store Voucher Title & Points (Current / Target) -->
@@ -191,6 +194,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=6.0"></script>
+  <script src="app.js?v=7.0"></script>
 </body>
 </html>

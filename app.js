@@ -10,6 +10,7 @@ const CIRCUMFERENCE = 175.93; // 2 * PI * 28
 const state = {
   name: "조재환",
   streak: 0,
+  hwStreak: 0,
   reward: 0,
   targetReward: 5000,
   tasks: [],
@@ -55,6 +56,7 @@ async function fetchLiveNotionData(studentName, urlParams) {
       const live = json.data;
       state.name = live.name;
       state.streak = live.streak;
+      state.hwStreak = live.hwStreak || 0;
       state.attendance = live.attendance;
       state.attDone = live.attDone;
       state.attTotal = live.attTotal;
@@ -129,7 +131,12 @@ function renderDashboard() {
 
   const pillStreak = document.getElementById("pillStreak");
   if (pillStreak) {
-    pillStreak.textContent = `🔥 ${state.streak}회 연속 완수`;
+    pillStreak.textContent = `🔥 ${state.streak}회 연속 출석`;
+  }
+
+  const pillHwStreak = document.getElementById("pillHwStreak");
+  if (pillHwStreak) {
+    pillHwStreak.textContent = `📝 ${state.hwStreak}회 연속 완수`;
   }
 
   // Line 2: Amounts
