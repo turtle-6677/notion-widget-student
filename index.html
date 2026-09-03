@@ -3,297 +3,204 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>학습 동기부여 대시보드 | Notion Widget</title>
-  <!-- Google Fonts & Icons -->
+  <title>학생 맞춤 학습 대시보드 위젯</title>
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- Canvas Confetti for Reward Celebration -->
+  <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="theme-auto">
-  <div class="widget-container" id="widgetApp">
-    <!-- Header: Student Greeting & Theme / Settings Toggle -->
-    <header class="widget-header">
-      <div class="student-info">
-        <div class="avatar-ring">
-          <span class="avatar-emoji" id="avatarEmoji">🎓</span>
+<body>
+  <div class="dashboard-card" id="dashboardWidget">
+    <!-- Discreet Settings Gear Button in Top-Right -->
+    <button class="settings-gear-btn" id="openSettingsBtn" title="선생님 데이터 설정 및 임베드 URL 복사">
+      <i data-lucide="settings"></i>
+    </button>
+
+    <!-- ROW 1: Convenience Store Mobile Voucher Header & Progress -->
+    <div class="voucher-section">
+      <div class="voucher-header">
+        <div class="voucher-title-wrap">
+          <span class="voucher-icon">🏪</span>
+          <span class="voucher-name">편의점 모바일 상품권</span>
+          <span class="voucher-amounts">
+            <span class="cur-reward" id="rewardCurrentText">₩3,400</span>
+            <span class="slash">/</span>
+            <span class="target-reward" id="rewardTargetText">₩5,000</span>
+          </span>
         </div>
-        <div>
-          <div class="greeting-row">
-            <h1 class="student-name" id="studentName">김철수</h1>
-            <span class="streak-badge" id="streakBadge" title="연속 과제 완수일">
-              <i data-lucide="flame" class="icon-flame"></i>
-              <span id="streakCount">7</span>회 연속 달성!
-            </span>
-          </div>
-          <p class="motivation-quote" id="motivationQuote">오늘의 과제를 모두 완료하고 100원을 챙겨가세요! 🔥</p>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <button class="icon-btn" id="themeToggleBtn" title="다크/라이트 테마 전환">
-          <i data-lucide="moon" id="themeIcon"></i>
-        </button>
-        <button class="icon-btn" id="openSettingsBtn" title="데이터 설정 및 노션 임베드 링크 생성">
-          <i data-lucide="settings"></i>
-        </button>
-      </div>
-    </header>
-
-    <!-- Main Section: 1. Convenience Store Voucher Card (편의점 상품권 보상) -->
-    <section class="gift-card-section">
-      <div class="gift-card" id="giftCard">
-        <div class="card-glow"></div>
-        <div class="card-inner">
-          <div class="card-top">
-            <div class="brand-tag">
-              <span class="convenience-badge">🏪 편의점 모바일 상품권</span>
-              <span class="rate-badge">하루 올클리어 후 선생님 검사 통과 시 +100원 🪙</span>
-            </div>
-            <div class="stamp-icon" id="targetStatusIcon">
-              <i data-lucide="gift"></i>
-            </div>
-          </div>
-
-          <div class="card-body">
-            <div class="current-reward-wrap">
-              <span class="reward-label">현재 누적 금액</span>
-              <div class="reward-amount-row">
-                <span class="currency">₩</span>
-                <span class="reward-amount" id="currentReward">3,400</span>
-                <span class="target-amount-text">/ <span id="targetReward">5,000</span>원</span>
-              </div>
-            </div>
-
-            <!-- Reward Progress Bar -->
-            <div class="reward-progress-container">
-              <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="rewardProgressFill" style="width: 68%;">
-                  <span class="coin-shine"></span>
-                </div>
-              </div>
-              <div class="reward-progress-info">
-                <span id="rewardPercentText">68% 달성</span>
-                <span id="rewardRemainingText">목표까지 1,600원 (앞으로 16회!)</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quick Reward Summary Pills (7일 차트 대신 직관적인 요약) -->
-          <div class="card-pills-row">
-            <span class="pill-item">
-              <i data-lucide="award" class="pill-icon"></i>
-              <span>누적 <strong>34회</strong> 완수</span>
-            </span>
-            <span class="pill-item">
-              <i data-lucide="sparkles" class="pill-icon"></i>
-              <span>5,000원 달성 시 <strong>즉시 기프티콘 발송</strong></span>
-            </span>
-          </div>
+        <div class="voucher-tags">
+          <span class="badge-pill pill-gold" id="pillCurrent">₩3,400</span>
+          <span class="badge-pill pill-blue" id="pillTarget">₩5,000</span>
+          <span class="badge-pill pill-streak" id="pillStreak">🔥 7회 연속 완수</span>
         </div>
       </div>
-    </section>
 
-    <!-- 2. Today's Interactive Homework Checklist (위젯 내 직접 체크 & 반응) -->
-    <section class="homework-checklist-section">
-      <div class="checklist-card">
+      <!-- Glowing Gradient Progress Bar -->
+      <div class="voucher-bar-row">
+        <div class="voucher-bar-track">
+          <div class="voucher-bar-fill" id="voucherBarFill" style="width: 68%;"></div>
+        </div>
+        <span class="voucher-percent-label" id="voucherPercentText">68%</span>
+      </div>
+    </div>
+
+    <!-- ROW 2: Middle Section (2 Columns Side-by-Side: Checklist + Inspection Banner) -->
+    <div class="middle-section">
+      <!-- Left Column: Checklist -->
+      <div class="checklist-col">
         <div class="checklist-header">
-          <div class="checklist-title-group">
-            <i data-lucide="check-square" class="icon-checklist"></i>
-            <span class="checklist-title">📝 오늘의 집숙제 체크리스트</span>
-          </div>
-          <span class="checklist-status-badge" id="checklistStatusBadge">진행중 ⏳</span>
+          <span class="checklist-icon">📝</span>
+          <h2 class="checklist-title">오늘의 집숙제 체크리스트</h2>
         </div>
-
-        <div class="checklist-items" id="checklistItems">
-          <!-- Dynamically populated via JS -->
-        </div>
-
-        <!-- Teacher Inspection Notice Banner (자가완료 시 등장) -->
-        <div class="inspection-banner hidden" id="inspectionBanner">
-          <div class="inspection-banner-left">
-            <span class="confetti-emoji">🎉</span>
-            <div>
-              <div class="inspection-title">오늘의 과제 100% 자가완료 달성!</div>
-              <div class="inspection-desc">선생님께 과제 검사를 받으면 <strong>+100원이 최종 적립</strong>됩니다 🪙</div>
-            </div>
-          </div>
-          <div class="inspection-tag">선생님 검사 대기중 ⏳</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 3. Key Stats Grid: 과제 수행률(듀얼) / 출석률 / 목표 진도율 -->
-    <section class="stats-grid">
-      <!-- 1. 과제 수행률 Card (오늘 과제 + 누적 과제 듀얼 표시) -->
-      <div class="stat-card" id="homeworkCard">
-        <div class="stat-header">
-          <div class="stat-icon-box icon-hw">
-            <i data-lucide="check-circle-2"></i>
-          </div>
-          <span class="stat-badge" id="hwBadge">오늘 과제</span>
-        </div>
-        <div class="stat-main">
-          <div class="circle-progress-wrap">
-            <svg class="progress-ring" width="76" height="76">
-              <circle class="progress-ring-bg" cx="38" cy="38" r="30"></circle>
-              <circle class="progress-ring-circle" id="hwCircle" cx="38" cy="38" r="30"></circle>
-            </svg>
-            <div class="circle-inner-text">
-              <span class="circle-percent" id="hwPercent">100</span><span class="unit">%</span>
-            </div>
-          </div>
-          <div class="stat-details">
-            <span class="stat-title">오늘 과제 수행률</span>
-            <span class="stat-value-text" id="hwCountText"><strong>3</strong> / 3개 완료</span>
-            <div class="dual-stat-sub">
-              <span class="dual-label">누적 성실도:</span>
-              <strong id="cumulativeHwRateText">94%</strong>
-              <span class="dual-sub" id="cumulativeHwCountText">(17/18회)</span>
-            </div>
-          </div>
+        <div class="task-list" id="taskList">
+          <!-- Dynamically Rendered by JS -->
         </div>
       </div>
 
-      <!-- 2. 출석률 Card -->
-      <div class="stat-card" id="attendanceCard">
-        <div class="stat-header">
-          <div class="stat-icon-box icon-att">
-            <i data-lucide="calendar-check"></i>
-          </div>
-          <span class="stat-badge green" id="attBadge">우수</span>
-        </div>
-        <div class="stat-main">
-          <div class="circle-progress-wrap">
-            <svg class="progress-ring" width="76" height="76">
-              <circle class="progress-ring-bg" cx="38" cy="38" r="30"></circle>
-              <circle class="progress-ring-circle ring-green" id="attCircle" cx="38" cy="38" r="30"></circle>
-            </svg>
-            <div class="circle-inner-text">
-              <span class="circle-percent" id="attPercent">95</span><span class="unit">%</span>
-            </div>
-          </div>
-          <div class="stat-details">
-            <span class="stat-title">출석률</span>
-            <span class="stat-value-text" id="attCountText"><strong>19</strong> / 20회 출석</span>
-            <span class="stat-sub">이번 달 지각 1회</span>
+      <!-- Right Column: Golden Glowing Celebration & Inspection Banner -->
+      <div class="inspection-col">
+        <div class="inspection-banner" id="inspectionBanner">
+          <div class="banner-emoji" id="bannerEmoji">🎉</div>
+          <div class="banner-title" id="bannerTitle">오늘 과제 100% 자가완료!</div>
+          <div class="banner-sub" id="bannerSub">
+            선생님께 검사받고 100원을 적립하세요! <span class="badge-waiting">[검사 대기중 ⏳]</span>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- 3. 목표 진도율 Card -->
-      <div class="stat-card" id="progressCard">
-        <div class="stat-header">
-          <div class="stat-icon-box icon-prog">
-            <i data-lucide="compass"></i>
-          </div>
-          <span class="stat-badge purple" id="progBadge">목표 향해 순항</span>
+    <!-- ROW 3: Three Circular Ring Gauges (Homework, Attendance, Progress) -->
+    <div class="gauges-section">
+      <!-- Gauge 1: Homework -->
+      <div class="gauge-item">
+        <div class="ring-wrap">
+          <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
+            <defs>
+              <linearGradient id="gradHw" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ec4899" />
+                <stop offset="100%" stop-color="#8b5cf6" />
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="34" cy="34" r="28" stroke-width="6" />
+            <circle class="ring-fill ring-hw" id="ringHwFill" cx="34" cy="34" r="28" stroke-width="6" stroke="url(#gradHw)" stroke-dasharray="175.93" stroke-dashoffset="0" />
+          </svg>
         </div>
-        <div class="stat-main">
-          <div class="circle-progress-wrap">
-            <svg class="progress-ring" width="76" height="76">
-              <circle class="progress-ring-bg" cx="38" cy="38" r="30"></circle>
-              <circle class="progress-ring-circle ring-purple" id="progCircle" cx="38" cy="38" r="30"></circle>
-            </svg>
-            <div class="circle-inner-text">
-              <span class="circle-percent" id="progPercent">72</span><span class="unit">%</span>
-            </div>
-          </div>
-          <div class="stat-details">
-            <span class="stat-title">목표 진도율</span>
-            <span class="stat-value-text" id="progChapterText"><strong>Chapter 8</strong> 진행중</span>
-            <span class="stat-sub">전체 12단원 중 8단원</span>
-          </div>
+        <div class="gauge-info">
+          <div class="gauge-title">Homework</div>
+          <div class="gauge-primary-val" id="hwTodayRateText">오늘 100% 완료 /</div>
+          <div class="gauge-sub-val" id="hwCumulativeText">누적 성실도 94% (17/18회)</div>
         </div>
       </div>
-    </section>
 
-    <!-- Bottom Action & Motivation Message -->
-    <footer class="widget-footer">
-      <div class="footer-tip">
-        <i data-lucide="sparkles" class="sparkle-icon"></i>
-        <span id="footerTipMsg">매일 꾸준함이 모여 5,000원 상품권이 됩니다! 오늘도 화이팅! 🥤</span>
-      </div>
-      <button class="celebrate-btn" id="testCelebrateBtn" title="보상 달성 축하 효과 보기">
-        🎉 축하 폭죽 테스트
-      </button>
-    </footer>
-
-    <!-- Settings & Notion URL Generator Modal -->
-    <div class="modal-backdrop" id="settingsModal">
-      <div class="modal-card">
-        <div class="modal-header">
-          <h3>⚙️ 학생 데이터 설정 & 노션 임베드 링크 생성</h3>
-          <button class="close-btn" id="closeSettingsBtn"><i data-lucide="x"></i></button>
+      <!-- Gauge 2: Attendance -->
+      <div class="gauge-item">
+        <div class="ring-wrap">
+          <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
+            <defs>
+              <linearGradient id="gradAtt" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#10b981" />
+                <stop offset="100%" stop-color="#34d399" />
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="34" cy="34" r="28" stroke-width="6" />
+            <circle class="ring-fill ring-att" id="ringAttFill" cx="34" cy="34" r="28" stroke-width="6" stroke="url(#gradAtt)" stroke-dasharray="175.93" stroke-dashoffset="8.8" />
+          </svg>
         </div>
-        <div class="modal-body">
-          <p class="modal-desc">값을 변경하면 실시간으로 반영되며, 학생 노션에 넣을 맞춤 URL이 즉시 생성됩니다.</p>
-          
-          <div class="form-grid">
-            <div class="form-group">
-              <label>학생 이름</label>
-              <input type="text" id="inputName" value="김철수">
-            </div>
-            <div class="form-group">
-              <label>연속 달성(회)</label>
-              <input type="number" id="inputStreak" value="7" min="0">
-            </div>
+        <div class="gauge-info">
+          <div class="gauge-title">Attendance</div>
+          <div class="gauge-primary-val" id="attRateText">95% (<span class="flame-badge">🔥7회 연속</span>)</div>
+          <div class="gauge-sub-val" id="attDetailText">출석 19회 / 총 20회</div>
+        </div>
+      </div>
 
-            <div class="form-group">
-              <label>현재 적립금(원)</label>
-              <input type="number" id="inputReward" value="3400" step="100" min="0">
-            </div>
-            <div class="form-group">
-              <label>목표 상품권 금액(원)</label>
-              <input type="number" id="inputTargetReward" value="5000" step="1000" min="1000">
-            </div>
+      <!-- Gauge 3: Progress -->
+      <div class="gauge-item">
+        <div class="ring-wrap">
+          <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
+            <defs>
+              <linearGradient id="gradProg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0284c7" />
+                <stop offset="100%" stop-color="#38bdf8" />
+              </linearGradient>
+            </defs>
+            <circle class="ring-track" cx="34" cy="34" r="28" stroke-width="6" />
+            <circle class="ring-fill ring-prog" id="ringProgFill" cx="34" cy="34" r="28" stroke-width="6" stroke="url(#gradProg)" stroke-dasharray="175.93" stroke-dashoffset="49.26" />
+          </svg>
+        </div>
+        <div class="gauge-info">
+          <div class="gauge-title">Progress</div>
+          <div class="gauge-primary-val" id="progRateText">72% (<span id="progChapterText">Chapter 8</span>)</div>
+          <div class="gauge-sub-val">진도 목표 80% 근접!</div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-            <div class="form-group full-width">
-              <label>오늘 집숙제 항목 (줄바꿈 또는 쉼표 구분)</label>
-              <textarea id="inputTasks" rows="3" placeholder="예: 쎈수학 50~55p B단계 홀수번&#10;영어 단어 Day 3 (30개)&#10;오답노트 작성"></textarea>
-            </div>
+  <!-- Teacher URL Generator Modal -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-row">
+          <i data-lucide="sliders" class="modal-icon"></i>
+          <h3>학생 데이터 설정 & 노션 임베드 URL 생성</h3>
+        </div>
+        <button class="close-btn" id="closeSettingsBtn"><i data-lucide="x"></i></button>
+      </div>
 
-            <div class="form-group">
-              <label>누적 과제 완수율 (%)</label>
-              <input type="number" id="inputCumulativeRate" value="94" min="0" max="100">
-            </div>
-            <div class="form-group">
-              <label>누적 과제 완수 횟수 (완수/총횟수)</label>
-              <div class="input-duo">
-                <input type="number" id="inputCumulativeDone" value="17" min="0">
-                <span>/</span>
-                <input type="number" id="inputCumulativeTotal" value="18" min="1">
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>출석률 (%)</label>
-              <input type="number" id="inputAtt" value="95" min="0" max="100">
-            </div>
-            <div class="form-group">
-              <label>목표 진도율 (%)</label>
-              <input type="number" id="inputProgress" value="72" min="0" max="100">
-            </div>
-            <div class="form-group full-width">
-              <label>진도 상세 문구</label>
-              <input type="text" id="inputProgChapter" value="Chapter 8">
-            </div>
+      <div class="modal-body">
+        <div class="input-grid">
+          <div class="input-group">
+            <label for="cfgName">학생 이름</label>
+            <input type="text" id="cfgName" value="김철수">
           </div>
-
-          <div class="generated-url-box">
-            <label>📋 노션 임베드용 URL (이 주소를 복사해 노션에 /embed 하세요)</label>
-            <div class="url-copy-row">
-              <input type="text" id="generatedUrlInput" readonly>
-              <button class="copy-btn" id="copyUrlBtn">
-                <i data-lucide="copy"></i> 복사하기
-              </button>
-            </div>
-            <span class="copy-feedback" id="copyFeedback"></span>
+          <div class="input-group">
+            <label for="cfgStreak">연속 완수일 (회)</label>
+            <input type="number" id="cfgStreak" value="7" min="0">
           </div>
+          <div class="input-group">
+            <label for="cfgReward">현재 적립 금액 (원)</label>
+            <input type="number" id="cfgReward" value="3400" step="100" min="0">
+          </div>
+          <div class="input-group">
+            <label for="cfgTarget">목표 금액 (원)</label>
+            <input type="number" id="cfgTarget" value="5000" step="500" min="1000">
+          </div>
+          <div class="input-group">
+            <label for="cfgAtt">출석률 (%)</label>
+            <input type="number" id="cfgAtt" value="95" min="0" max="100">
+          </div>
+          <div class="input-group">
+            <label for="cfgProg">진도율 (%)</label>
+            <input type="number" id="cfgProg" value="72" min="0" max="100">
+          </div>
+          <div class="input-group">
+            <label for="cfgChapter">현재 진도 단원</label>
+            <input type="text" id="cfgChapter" value="Chapter 8">
+          </div>
+          <div class="input-group">
+            <label for="cfgCRate">누적 과제 성실도 (%)</label>
+            <input type="number" id="cfgCRate" value="94" min="0" max="100">
+          </div>
+          <div class="input-group full-width">
+            <label for="cfgTasks">오늘의 집숙제 목록 (쉼표 , 로 구분 / 끝에 :1 붙이면 완료 표시)</label>
+            <input type="text" id="cfgTasks" value="수학 익힘책 p.45-47 풀기:1, 영어 단어 50개 암기:1, 과학 보고서 초안 작성:1, 국어 문제집 p.32 풀기:0">
+          </div>
+        </div>
+
+        <div class="url-output-section">
+          <label>생성된 노션 임베드용 URL</label>
+          <div class="copy-box">
+            <input type="text" id="embedUrlOutput" readonly>
+            <button class="copy-btn" id="copyUrlBtn">
+              <i data-lucide="copy"></i> URL 복사
+            </button>
+          </div>
+          <p class="copy-hint">💡 이 주소를 복사한 뒤 노션 페이지에서 <code>/embed</code> 를 입력하고 붙여넣으세요!</p>
         </div>
       </div>
     </div>

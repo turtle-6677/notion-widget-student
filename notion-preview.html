@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧑‍🎓 김철수 학생의 맞춤 학습 대시보드 | Notion Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background-color: #191919;
+      color: #e6e6e6;
+      font-family: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Notion App Top Bar */
+    .notion-topbar {
+      height: 45px;
+      background: #191919;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 13px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #999;
+    }
+    .topbar-left .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .topbar-left .page-title-crumb {
+      color: #ffffff;
+      font-weight: 500;
+    }
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn-notion-share {
+      background: #2383e2;
+      color: #fff;
+      border: none;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .topbar-icon-btn {
+      background: transparent;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+      border-radius: 4px;
+    }
+    .topbar-icon-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+
+    /* Page Container */
+    .notion-page {
+      max-width: 1140px;
+      width: 100%;
+      margin: 0 auto;
+      padding-bottom: 80px;
+    }
+
+    /* Cover Banner */
+    .notion-cover {
+      height: 180px;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e3a8a 100%);
+      position: relative;
+    }
+    .notion-cover-deco {
+      position: absolute;
+      right: 40px;
+      bottom: 20px;
+      font-size: 40px;
+      opacity: 0.15;
+      user-select: none;
+    }
+
+    /* Content Area */
+    .notion-content {
+      padding: 0 40px;
+      position: relative;
+    }
+
+    /* Page Icon & Title */
+    .notion-page-icon {
+      font-size: 64px;
+      margin-top: -40px;
+      margin-bottom: 12px;
+      display: inline-block;
+      cursor: default;
+    }
+    .notion-title {
+      font-size: 34px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+      margin-bottom: 24px;
+    }
+
+    /* Embedded Widget Section */
+    .widget-block {
+      margin-bottom: 36px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #1e1e1e;
+    }
+    .widget-iframe {
+      width: 100%;
+      height: 480px;
+      border: none;
+      display: block;
+    }
+
+    /* Notion 2-Column Section below Widget */
+    .notion-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    @media (max-width: 900px) {
+      .notion-columns {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Notion Database Container */
+    .db-container {
+      background: #202020;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .db-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .db-title {
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+    }
+    .db-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* Database Table View */
+    .db-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .db-table th {
+      text-align: left;
+      padding: 8px 14px;
+      background: #242424;
+      color: #8c8c8c;
+      font-weight: 500;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-right: 1px solid rgba(255, 255, 255, 0.03);
+    }
+    .db-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-right: 1px solid rgba(255, 255, 255, 0.03);
+      vertical-align: middle;
+    }
+    .db-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .badge-green {
+      background: rgba(46, 160, 67, 0.2);
+      color: #3fb950;
+      border: 1px solid rgba(46, 160, 67, 0.3);
+    }
+    .badge-yellow {
+      background: rgba(210, 153, 34, 0.2);
+      color: #d29922;
+      border: 1px solid rgba(210, 153, 34, 0.3);
+    }
+    .badge-blue {
+      background: rgba(56, 139, 253, 0.18);
+      color: #58a6ff;
+      border: 1px solid rgba(56, 139, 253, 0.25);
+    }
+    .badge-red {
+      background: rgba(248, 81, 73, 0.18);
+      color: #f85149;
+      border: 1px solid rgba(248, 81, 73, 0.25);
+    }
+
+    /* Gallery Cards (Mistake Notes) */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      padding: 16px;
+    }
+    .gallery-card {
+      background: #252525;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .gallery-card:hover {
+      background: #2a2a2a;
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+    .card-topic {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 6px;
+    }
+    .card-mistake-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .card-feedback {
+      font-size: 12px;
+      color: #bbb;
+      background: #1c1c1c;
+      padding: 8px;
+      border-radius: 6px;
+      border-left: 2px solid #58a6ff;
+      margin-bottom: 8px;
+      line-height: 1.35;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Notion App Top Bar -->
+  <header class="notion-topbar">
+    <div class="topbar-left">
+      <div class="breadcrumb">
+        <span>SSAM 수학클리닉</span>
+        <span>/</span>
+        <span>학생 관리</span>
+        <span>/</span>
+        <span class="page-title-crumb">🧑‍🎓 김철수 맞춤 대시보드</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-icon-btn"><i data-lucide="clock" style="width:16px;height:16px;"></i></button>
+      <button class="topbar-icon-btn"><i data-lucide="star" style="width:16px;height:16px;"></i></button>
+      <button class="btn-notion-share">공유</button>
+      <button class="topbar-icon-btn"><i data-lucide="more-horizontal" style="width:16px;height:16px;"></i></button>
+    </div>
+  </header>
+
+  <!-- Page Body -->
+  <main class="notion-page">
+    <div class="notion-cover">
+      <span class="notion-cover-deco">∑ ∫ dx dy</span>
+    </div>
+
+    <div class="notion-content">
+      <div class="notion-page-icon">🧑‍🎓</div>
+      <h1 class="notion-title">김철수 학생의 맞춤 학습 대시보드</h1>
+
+      <!-- 1. LIVE EMBEDDED WIDGET (체크리스트 내장 + 듀얼 과제수행률 + 선생님 검사 배너) -->
+      <div class="widget-block">
+        <iframe src="index.html?name=김철수&reward=3400&target=5000&streak=7&cRate=94&att=95&prog=72&chapter=Chapter+8&tasks=수학 익힘책 p.45-47 풀기:1,영어 단어 50개 암기:1,과학 보고서 초안 작성:1,국어 문제집 p.32 풀기:0" class="widget-iframe" id="widgetFrame"></iframe>
+      </div>
+
+      <!-- 2. NOTION LINKED DATABASE VIEWS (수업 일정 & 실수 노트 2개 컬럼) -->
+      <div class="notion-columns">
+        
+        <!-- Left Column: Class Schedule & Attendance -->
+        <div class="column-left">
+          <div class="db-container">
+            <div class="db-header">
+              <div class="db-title">
+                <i data-lucide="calendar" style="width: 18px; height: 18px; color: #3fb950;"></i>
+                <span>📅 수업 일정 & 출결 현황 (개별수업기록 DB)</span>
+              </div>
+              <div class="db-controls">
+                <span>최근 4회</span>
+              </div>
+            </div>
+
+            <table class="db-table">
+              <thead>
+                <tr>
+                  <th>수업 일시</th>
+                  <th>수업 진도</th>
+                  <th>출결</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>09/03 (수) 18:00</td>
+                  <td>수학(상) - 이차함수의 최대최소</td>
+                  <td><span class="badge badge-green">출석 🟢</span></td>
+                </tr>
+                <tr>
+                  <td>09/01 (월) 18:00</td>
+                  <td>수학(상) - 이차방정식의 판별식</td>
+                  <td><span class="badge badge-green">출석 🟢</span></td>
+                </tr>
+                <tr>
+                  <td>08/29 (금) 18:00</td>
+                  <td>수학(상) - 복소수와 이차방정식</td>
+                  <td><span class="badge badge-yellow">지각 🟡 (10분)</span></td>
+                </tr>
+                <tr>
+                  <td>08/26 (수) 18:00</td>
+                  <td>수학(상) - 인수분해 심화</td>
+                  <td><span class="badge badge-green">출석 🟢</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right Column: Mistakes & Feedback Gallery -->
+        <div class="column-right">
+          <div class="db-container">
+            <div class="db-header">
+              <div class="db-title">
+                <i data-lucide="lightbulb" style="width: 18px; height: 18px; color: #f0883e;"></i>
+                <span>💡 나의 수학 실수 & 오답 노트 (실수 DB)</span>
+              </div>
+              <div class="db-controls">
+                <span>단원별 보기</span>
+              </div>
+            </div>
+
+            <div class="gallery-grid">
+              <div class="gallery-card">
+                <div class="card-topic">수학(상) > 이차방정식</div>
+                <div class="card-mistake-title">부등식 음수 곱할 때 방향 미변경</div>
+                <div class="card-feedback">선생님 코멘트: -1을 곱하거나 나눌 때 부등호 방향부터 먼저 뒤집어놓고 계산하기!</div>
+                <span class="badge badge-red">⚠️ 계산실수</span>
+              </div>
+
+              <div class="gallery-card">
+                <div class="card-topic">수학(상) > 이차함수</div>
+                <div class="card-mistake-title">x의 제한범위(양수조건) 누락</div>
+                <div class="card-feedback">선생님 코멘트: 문제 첫 줄에 "양수 x" 조건 나오면 바로 형광펜 치고 시작하자.</div>
+                <span class="badge badge-yellow">🔍 조건오독</span>
+              </div>
+
+              <div class="gallery-card">
+                <div class="card-topic">수학(상) > 인수분해</div>
+                <div class="card-mistake-title">완전제곱식 판별식 D=0 조건 혼동</div>
+                <div class="card-feedback">선생님 코멘트: 중근을 가질 때와 완전제곱식일 때의 공통 조건 개념 다시 복습 완료.</div>
+                <span class="badge badge-blue">📖 개념혼동</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
