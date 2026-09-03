@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function fetchLiveNotionData(studentName, urlParams) {
   try {
     setLoadingState(true);
-    const res = await fetch(`${WORKER_API_BASE}?name=${encodeURIComponent(studentName)}`);
+    const res = await fetch(`${WORKER_API_BASE}?name=${encodeURIComponent(studentName)}&_t=${Date.now()}`, { cache: "no-store" });
     const json = await res.json();
 
     if (json.success && json.data) {
