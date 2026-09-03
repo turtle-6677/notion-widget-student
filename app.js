@@ -33,7 +33,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 1. Initial local render
   parseUrlParams();
   renderDashboard();
-  setupEvents();
 
   // 2. Fetch live data from Notion DB via Cloudflare Worker
   const params = new URLSearchParams(window.location.search);
@@ -47,7 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
  */
 async function fetchLiveNotionData(studentName, urlParams) {
   try {
-    setLoadingState(true);
+    state.isLoading = true;
     // Simple GET request with timestamp _t for zero-cache & guaranteed CORS safety
     const res = await fetch(`${WORKER_API_BASE}?name=${encodeURIComponent(studentName)}&_t=${Date.now()}`);
     const json = await res.json();
@@ -75,6 +74,7 @@ async function fetchLiveNotionData(studentName, urlParams) {
       if (urlParams.has("reward")) state.reward = parseInt(urlParams.get("reward"), 10) || state.reward;
       if (urlParams.has("target")) state.targetReward = parseInt(urlParams.get("target"), 10) || state.targetReward;
       if (urlParams.has("streak")) state.streak = parseInt(urlParams.get("streak"), 10) || state.streak;
+      if (urlParams.has("hwStreak")) state.hwStreak = parseInt(urlParams.get("hwStreak"), 10) || state.hwStreak;
       if (urlParams.has("att")) state.attendance = parseInt(urlParams.get("att"), 10) || state.attendance;
       if (urlParams.has("prog")) state.progress = parseInt(urlParams.get("prog"), 10) || state.progress;
       if (urlParams.has("chapter")) state.progChapter = urlParams.get("chapter");
@@ -84,22 +84,8 @@ async function fetchLiveNotionData(studentName, urlParams) {
   } catch (err) {
     console.error("Failed to connect to Notion backend:", err);
   } finally {
-    setLoadingState(false);
+    state.isLoading = false;
     renderDashboard();
-  }
-}
-
-function setLoadingState(loading) {
-  state.isLoading = loading;
-  const gearBtn = document.getElementById("openSettingsBtn");
-  if (gearBtn) {
-    if (loading) {
-      gearBtn.style.opacity = "0.5";
-      gearBtn.style.animation = "spin 1s linear infinite";
-    } else {
-      gearBtn.style.opacity = "1";
-      gearBtn.style.animation = "none";
-    }
   }
 }
 
@@ -111,6 +97,7 @@ function parseUrlParams() {
 
   if (params.has("name")) state.name = params.get("name");
   if (params.has("streak")) state.streak = parseInt(params.get("streak"), 10) || state.streak;
+  if (params.has("hwStreak")) state.hwStreak = parseInt(params.get("hwStreak"), 10) || state.hwStreak;
   if (params.has("reward")) state.reward = parseInt(params.get("reward"), 10) || state.reward;
   if (params.has("target")) state.targetReward = parseInt(params.get("target"), 10) || state.targetReward;
   if (params.has("att")) state.attendance = parseInt(params.get("att"), 10) || state.attendance;
@@ -123,7 +110,7 @@ function parseUrlParams() {
  * 3. Render Full Dashboard UI
  */
 function renderDashboard() {
-  // Line 1: Student Name Tag & Streak
+  // Line 1: Student Name Tag & Streaks
   const studentTag = document.getElementById("studentNameTag");
   if (studentTag) {
     studentTag.textContent = `🧑‍🎓 ${state.name}`;
@@ -155,7 +142,7 @@ function renderDashboard() {
   // Row 2: Checklist & Inspection Banner
   renderChecklist();
 
-  // Row 3: Circular Ring Gauges (숙제, 출석률, 진도)
+  // Row 3: Circular Ring Gauges (오늘 숙제, 출석률, 진도)
   renderGauges();
 
   // Update Lucide Icons
@@ -174,6 +161,7 @@ function renderChecklist() {
   // 로딩 중이고 아직 숙제가 안 들어왔을 때
   if (state.isLoading && state.tasks.length === 0) {
     container.innerHTML = '<div class="task-loading-placeholder">오늘의 숙제를 불러오는 중입니다... ⏳</div>';
+    updateInspectionBanner();
     return;
   }
 
@@ -242,13 +230,26 @@ function updateInspectionBanner() {
   const sub = document.getElementById("bannerSub");
   const emoji = document.getElementById("bannerEmoji");
 
+  // 로딩 중일 때는 배너를 완전히 숨겨서 가짜 문구 노출 방지
+  if (state.isLoading) {
+    banner.style.opacity = "0";
+    banner.style.pointerEvents = "none";
+    return;
+  }
+
+  banner.style.opacity = "1";
+  banner.style.pointerEvents = "auto";
+
   // 1. 숙제가 없을 때
   if (state.tasks.length === 0) {
     emoji.textContent = "☕";
     title.textContent = "오늘 숙제 없음";
+    title.style.color = "#a7f3d0";
     sub.innerHTML = "최근 수업에 부여된 집숙제가 없습니다.<br>편안하고 즐거운 하루 보내세요! ✨";
+    sub.style.color = "#6ee7b7";
     banner.style.borderColor = "rgba(16, 185, 129, 0.4)";
     banner.style.background = "rgba(12, 36, 24, 0.85)";
+    banner.style.boxShadow = "0 0 15px rgba(16, 185, 129, 0.15)";
     return;
   }
 
@@ -257,21 +258,27 @@ function updateInspectionBanner() {
   if (allDone) {
     emoji.textContent = "🎉";
     title.textContent = "오늘 과제 100% 완료!";
+    title.style.color = "#fef08a";
     sub.innerHTML = `선생님께 검사받고 100원을 적립하세요! <span class="badge-waiting">[검사 대기중 ⏳]</span>`;
+    sub.style.color = "#fde047";
     banner.style.borderColor = "#eab308";
     banner.style.background = "rgba(36, 28, 12, 0.85)";
+    banner.style.boxShadow = "0 0 20px rgba(234, 179, 8, 0.25)";
   } else {
     // 3. 숙제가 있고 아직 진행 중일 때
     emoji.textContent = "📝";
     title.textContent = "오늘 과제 진행 중!";
+    title.style.color = "#cbd5e1";
     sub.innerHTML = `과제를 모두 체크하면 축하 폭죽과 함께 <br>선생님 검사 대기 모드로 전환됩니다! 🪙`;
-    banner.style.borderColor = "rgba(234, 179, 8, 0.4)";
+    sub.style.color = "#94a3b8";
+    banner.style.borderColor = "rgba(148, 163, 184, 0.25)";
     banner.style.background = "rgba(20, 26, 40, 0.7)";
+    banner.style.boxShadow = "none";
   }
 }
 
 /**
- * 7. Render Circular Ring Gauges (숙제, 출석률, 진도)
+ * 7. Render Circular Ring Gauges (오늘 숙제, 출석률, 진도)
  */
 function renderGauges() {
   updateHomeworkGauge();
@@ -312,65 +319,4 @@ function triggerConfetti() {
       colors: ['#f59e0b', '#ec4899', '#3b82f6', '#10b981', '#facc15']
     });
   }
-}
-
-/**
- * 9. Setup Events & Teacher Settings Modal
- */
-function setupEvents() {
-  const modal = document.getElementById("settingsModal");
-  const openBtn = document.getElementById("openSettingsBtn");
-  const closeBtn = document.getElementById("closeSettingsBtn");
-  const copyBtn = document.getElementById("copyUrlBtn");
-  const nameInput = document.getElementById("cfgName");
-
-  openBtn.addEventListener("click", () => {
-    nameInput.value = state.name;
-    generateEmbedUrl();
-    modal.classList.add("show");
-  });
-
-  closeBtn.addEventListener("click", () => {
-    modal.classList.remove("show");
-  });
-
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) modal.classList.remove("show");
-  });
-
-  nameInput.addEventListener("input", () => {
-    generateEmbedUrl();
-  });
-
-  // Student chips click handler
-  const chipButtons = document.querySelectorAll(".chip-btn");
-  chipButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      chipButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const student = btn.getAttribute("data-student");
-      nameInput.value = student;
-      generateEmbedUrl();
-    });
-  });
-
-  copyBtn.addEventListener("click", () => {
-    const urlInput = document.getElementById("embedUrlOutput");
-    urlInput.select();
-    navigator.clipboard.writeText(urlInput.value).then(() => {
-      copyBtn.innerHTML = '<i data-lucide="check"></i> 복사 완료!';
-      if (window.lucide) lucide.createIcons();
-      setTimeout(() => {
-        copyBtn.innerHTML = '<i data-lucide="copy"></i> URL 복사';
-        if (window.lucide) lucide.createIcons();
-      }, 2000);
-    });
-  });
-}
-
-function generateEmbedUrl() {
-  const name = document.getElementById("cfgName").value.trim();
-  const baseUrl = "https://turtle-6677.github.io/notion-widget-student/";
-  const finalUrl = `${baseUrl}?name=${encodeURIComponent(name)}`;
-  document.getElementById("embedUrlOutput").value = finalUrl;
 }

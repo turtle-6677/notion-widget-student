@@ -12,14 +12,10 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=7.1">
+  <link rel="stylesheet" href="style.css?v=8.0">
 </head>
 <body>
   <div class="dashboard-card" id="dashboardWidget">
-    <!-- Discreet Settings Gear Button in Top-Right -->
-    <button class="settings-gear-btn" id="openSettingsBtn" title="선생님 데이터 설정 및 임베드 URL 복사">
-      <i data-lucide="settings"></i>
-    </button>
 
     <!-- ROW 1: Convenience Store Mobile Voucher Header & Progress -->
     <div class="voucher-section">
@@ -67,21 +63,19 @@
         </div>
       </div>
 
-      <!-- Right Column: Golden Glowing Celebration & Inspection Banner -->
+      <!-- Right Column: Celebration & Inspection Banner (처음 로딩 시에는 빈 공간으로 시작하여 깜빡임 방지) -->
       <div class="inspection-col">
-        <div class="inspection-banner" id="inspectionBanner">
-          <div class="banner-emoji" id="bannerEmoji">🎉</div>
-          <div class="banner-title" id="bannerTitle">오늘 과제 100% 완료!</div>
-          <div class="banner-sub" id="bannerSub">
-            선생님께 검사받고 100원을 적립하세요! <span class="badge-waiting">[검사 대기중 ⏳]</span>
-          </div>
+        <div class="inspection-banner" id="inspectionBanner" style="opacity: 0; pointer-events: none;">
+          <div class="banner-emoji" id="bannerEmoji"></div>
+          <div class="banner-title" id="bannerTitle"></div>
+          <div class="banner-sub" id="bannerSub"></div>
         </div>
       </div>
     </div>
 
-    <!-- ROW 3: Three Circular Ring Gauges (숙제, 출석률, 진도) -->
+    <!-- ROW 3: Three Circular Ring Gauges (오늘 숙제, 출석률, 진도) -->
     <div class="gauges-section">
-      <!-- Gauge 1: 숙제 (전에는 Homework) -->
+      <!-- Gauge 1: 오늘 숙제 -->
       <div class="gauge-item">
         <div class="ring-wrap">
           <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
@@ -102,7 +96,7 @@
         </div>
       </div>
 
-      <!-- Gauge 2: 출석률 (전에는 Attendance) -->
+      <!-- Gauge 2: 출석률 -->
       <div class="gauge-item">
         <div class="ring-wrap">
           <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
@@ -123,7 +117,7 @@
         </div>
       </div>
 
-      <!-- Gauge 3: 진도 (전에는 Progress) -->
+      <!-- Gauge 3: 진도 -->
       <div class="gauge-item">
         <div class="ring-wrap">
           <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
@@ -146,54 +140,6 @@
     </div>
   </div>
 
-  <!-- Teacher URL Generator Modal with Quick Student Selector -->
-  <div class="modal-backdrop" id="settingsModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-title-row">
-          <i data-lucide="sliders" class="modal-icon"></i>
-          <h3>학생 선택 & 노션 DB 연동 URL 복사</h3>
-        </div>
-        <button class="close-btn" id="closeSettingsBtn"><i data-lucide="x"></i></button>
-      </div>
-
-      <div class="modal-body">
-        <div class="quick-student-select-box">
-          <label><strong>🧑‍🎓 노션 DB 등록 학생 선택 (클릭 시 URL 자동 생성):</strong></label>
-          <div class="student-chips" id="studentChips">
-            <button class="chip-btn" data-student="조재환">조재환</button>
-            <button class="chip-btn" data-student="이서준">이서준</button>
-            <button class="chip-btn" data-student="박민준">박민준</button>
-            <button class="chip-btn" data-student="김선우">김선우</button>
-            <button class="chip-btn" data-student="고준서">고준서</button>
-            <button class="chip-btn" data-student="최준혁">최준혁</button>
-            <button class="chip-btn" data-student="신예은">신예은</button>
-            <button class="chip-btn" data-student="이서윤">이서윤</button>
-            <button class="chip-btn" data-student="김세윤">김세윤</button>
-          </div>
-        </div>
-
-        <div class="input-grid">
-          <div class="input-group full-width">
-            <label for="cfgName">학생 이름 직접 입력</label>
-            <input type="text" id="cfgName" value="조재환" placeholder="노션 DB에 등록된 학생 이름 입력">
-          </div>
-        </div>
-
-        <div class="url-output-section">
-          <label>생성된 학생 맞춤 노션 임베드용 URL</label>
-          <div class="copy-box">
-            <input type="text" id="embedUrlOutput" readonly>
-            <button class="copy-btn" id="copyUrlBtn">
-              <i data-lucide="copy"></i> URL 복사
-            </button>
-          </div>
-          <p class="copy-hint">💡 이 주소를 복사한 뒤 해당 학생 노션 페이지의 <code>/embed</code> 에 붙여넣으세요!</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="app.js?v=7.1"></script>
+  <script src="app.js?v=8.0"></script>
 </body>
 </html>
