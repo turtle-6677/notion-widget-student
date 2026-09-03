@@ -1,21 +1,22 @@
 /**
  * Notion Student Motivation Dashboard Widget
- * Exact Match to User Design Mockup
+ * Connected to Live Notion Cloudflare Worker Backend
  */
 
+const WORKER_API_BASE = "https://notion-worker.q936677.workers.dev/api/student-dashboard";
 const CIRCUMFERENCE = 175.93; // 2 * PI * 28
 
-// State definition
+// State definition (starts with default/fallback data, updated via Notion API)
 const state = {
   name: "김철수",
   streak: 7,
   reward: 3400,
   targetReward: 5000,
   tasks: [
-    { id: 1, text: "수학 익힘책 p.45-47 풀기", done: true },
-    { id: 2, text: "영어 단어 50개 암기", done: true },
-    { id: 3, text: "과학 보고서 초안 작성", done: true },
-    { id: 4, text: "국어 문제집 p.32 풀기", done: false }
+    { id: "mock-1", text: "수학 익힘책 p.45-47 풀기", done: true },
+    { id: "mock-2", text: "영어 단어 50개 암기", done: true },
+    { id: "mock-3", text: "과학 보고서 초안 작성", done: true },
+    { id: "mock-4", text: "국어 문제집 p.32 풀기", done: false }
   ],
   cumulativeRate: 94,
   cumulativeDone: 17,
@@ -24,21 +25,90 @@ const state = {
   attDone: 19,
   attTotal: 20,
   progress: 72,
-  progChapter: "Chapter 8"
+  progChapter: "Chapter 8",
+  isLoading: false
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   if (window.lucide) {
     lucide.createIcons();
   }
 
+  // 1. Initial local render with default or URL params
   parseUrlParams();
   renderDashboard();
   setupEvents();
+
+  // 2. If student 'name' is in URL, fetch live data from Notion DB via Cloudflare Worker!
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("name") && params.get("name").trim() !== "") {
+    await fetchLiveNotionData(params.get("name").trim(), params);
+  }
 });
 
 /**
- * 1. Parse URL Parameters
+ * 1. Fetch live student data from Notion Cloudflare Worker
+ */
+async function fetchLiveNotionData(studentName, urlParams) {
+  try {
+    setLoadingState(true);
+    const res = await fetch(`${WORKER_API_BASE}?name=${encodeURIComponent(studentName)}`);
+    const json = await res.json();
+
+    if (json.success && json.data) {
+      const live = json.data;
+      state.name = live.name;
+      state.streak = live.streak;
+      state.attendance = live.attendance;
+      state.attDone = live.attDone;
+      state.attTotal = live.attTotal;
+      state.progress = live.progress;
+      state.progChapter = live.progChapter;
+      state.cumulativeRate = live.cumulativeRate;
+      state.cumulativeDone = live.cumulativeDone;
+      state.cumulativeTotal = live.cumulativeTotal;
+      state.targetReward = live.targetReward;
+      state.reward = live.reward;
+
+      if (Array.isArray(live.tasks) && live.tasks.length > 0) {
+        state.tasks = live.tasks;
+      }
+
+      // Allow URL overrides if explicitly provided
+      if (urlParams.has("reward")) state.reward = parseInt(urlParams.get("reward"), 10) || state.reward;
+      if (urlParams.has("target")) state.targetReward = parseInt(urlParams.get("target"), 10) || state.targetReward;
+      if (urlParams.has("streak")) state.streak = parseInt(urlParams.get("streak"), 10) || state.streak;
+      if (urlParams.has("att")) state.attendance = parseInt(urlParams.get("att"), 10) || state.attendance;
+      if (urlParams.has("prog")) state.progress = parseInt(urlParams.get("prog"), 10) || state.progress;
+      if (urlParams.has("chapter")) state.progChapter = urlParams.get("chapter");
+
+      renderDashboard();
+    } else {
+      console.warn("Notion data notice:", json.error);
+    }
+  } catch (err) {
+    console.error("Failed to connect to Notion backend:", err);
+  } finally {
+    setLoadingState(false);
+  }
+}
+
+function setLoadingState(loading) {
+  state.isLoading = loading;
+  const gearBtn = document.getElementById("openSettingsBtn");
+  if (gearBtn) {
+    if (loading) {
+      gearBtn.style.opacity = "0.5";
+      gearBtn.style.animation = "spin 1s linear infinite";
+    } else {
+      gearBtn.style.opacity = "1";
+      gearBtn.style.animation = "none";
+    }
+  }
+}
+
+/**
+ * 2. Parse URL Parameters (for offline or custom override use)
  */
 function parseUrlParams() {
   const params = new URLSearchParams(window.location.search);
@@ -57,13 +127,13 @@ function parseUrlParams() {
     state.tasks = rawTasks.map((t, idx) => {
       const parts = t.trim().split(":");
       const isDone = parts.length > 1 ? parts[1] === "1" || parts[1] === "true" : false;
-      return { id: idx + 1, text: parts[0].trim(), done: isDone };
+      return { id: `param-${idx + 1}`, text: parts[0].trim(), done: isDone };
     });
   }
 }
 
 /**
- * 2. Render Full Dashboard UI
+ * 3. Render Full Dashboard UI
  */
 function renderDashboard() {
   // Row 1: Voucher Amounts & Progress
@@ -93,7 +163,7 @@ function renderDashboard() {
 }
 
 /**
- * 3. Render Checklist with Numbered Items & 완료/미완료 tags
+ * 4. Render Checklist with Numbered Items & 완료/미완료 tags
  */
 function renderChecklist() {
   const container = document.getElementById("taskList");
@@ -129,24 +199,39 @@ function renderChecklist() {
 }
 
 /**
- * 4. Toggle Task State
+ * 5. Toggle Task State & Sync with Notion DB!
  */
-function toggleTask(taskId) {
+async function toggleTask(taskId) {
   const task = state.tasks.find(t => t.id === taskId);
   if (!task) return;
 
+  // 1. Optimistic local update
   task.done = !task.done;
   renderChecklist();
 
-  // Check if all tasks are done
+  // Check celebration
   const allDone = state.tasks.length > 0 && state.tasks.every(t => t.done);
   if (allDone) {
     triggerConfetti();
   }
+
+  // 2. Real-time Notion DB Update via Cloudflare Worker
+  if (taskId && !String(taskId).startsWith("mock-") && !String(taskId).startsWith("param-")) {
+    try {
+      await fetch(`${WORKER_API_BASE}/toggle-task`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ taskId: task.id, done: task.done })
+      });
+      console.log(`Synced task ${taskId} with Notion DB: done = ${task.done}`);
+    } catch (err) {
+      console.warn("Failed to sync toggle with Notion DB:", err);
+    }
+  }
 }
 
 /**
- * 5. Update Banner Text & Style based on Completion
+ * 6. Update Banner Text & Style based on Completion
  */
 function updateInspectionBanner() {
   const allDone = state.tasks.length > 0 && state.tasks.every(t => t.done);
@@ -171,7 +256,7 @@ function updateInspectionBanner() {
 }
 
 /**
- * 6. Render Circular Ring Gauges
+ * 7. Render Circular Ring Gauges
  */
 function renderGauges() {
   updateHomeworkGauge();
@@ -201,7 +286,7 @@ function updateHomeworkGauge() {
 }
 
 /**
- * 7. Confetti Explosion
+ * 8. Confetti Explosion
  */
 function triggerConfetti() {
   if (typeof confetti === "function") {
@@ -215,7 +300,7 @@ function triggerConfetti() {
 }
 
 /**
- * 8. Setup Events & Teacher Settings Modal
+ * 9. Setup Events & Teacher Settings Modal
  */
 function setupEvents() {
   const modal = document.getElementById("settingsModal");
@@ -272,28 +357,9 @@ function populateModal() {
 
 function generateEmbedUrl() {
   const name = document.getElementById("cfgName").value.trim();
-  const streak = document.getElementById("cfgStreak").value.trim();
-  const reward = document.getElementById("cfgReward").value.trim();
-  const target = document.getElementById("cfgTarget").value.trim();
-  const att = document.getElementById("cfgAtt").value.trim();
-  const prog = document.getElementById("cfgProg").value.trim();
-  const chapter = document.getElementById("cfgChapter").value.trim();
-  const cRate = document.getElementById("cfgCRate").value.trim();
-  const tasks = document.getElementById("cfgTasks").value.trim();
-
   const baseUrl = window.location.origin + window.location.pathname;
-  const params = new URLSearchParams();
 
-  if (name) params.set("name", name);
-  if (streak) params.set("streak", streak);
-  if (reward) params.set("reward", reward);
-  if (target) params.set("target", target);
-  if (att) params.set("att", att);
-  if (prog) params.set("prog", prog);
-  if (chapter) params.set("chapter", chapter);
-  if (cRate) params.set("cRate", cRate);
-  if (tasks) params.set("tasks", tasks);
-
-  const finalUrl = `${baseUrl}?${params.toString()}`;
+  // With live Notion DB sync, passing only '?name=학생이름' is enough!
+  const finalUrl = `${baseUrl}?name=${encodeURIComponent(name)}`;
   document.getElementById("embedUrlOutput").value = finalUrl;
 }
