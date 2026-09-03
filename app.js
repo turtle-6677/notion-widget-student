@@ -6,28 +6,22 @@
 const WORKER_API_BASE = "https://notion-worker.q936677.workers.dev/api/student-dashboard";
 const CIRCUMFERENCE = 175.93; // 2 * PI * 28
 
-// State definition
+// State definition (starts clean with no mock tasks!)
 const state = {
   name: "조재환",
-  streak: 7,
-  reward: 3400,
+  streak: 0,
+  reward: 0,
   targetReward: 5000,
-  tasks: [
-    { id: "mock-1", text: "수학 익힘책 p.45-47 풀기", done: true },
-    { id: "mock-2", text: "영어 단어 50개 암기", done: true },
-    { id: "mock-3", text: "과학 보고서 초안 작성", done: true },
-    { id: "mock-4", text: "국어 문제집 p.32 풀기", done: false }
-  ],
-  cumulativeRate: 94,
-  cumulativeDone: 17,
-  cumulativeTotal: 18,
-  attendance: 95,
-  attDone: 19,
-  attTotal: 20,
-  progress: 72,
-  progChapter: "Chapter 8",
-  isLiveSync: false,
-  isLoading: false
+  tasks: [], // 빈 배열로 시작하여 깜빡임/가짜숙제 노출 원천 차단!
+  cumulativeRate: 0,
+  cumulativeDone: 0,
+  cumulativeTotal: 0,
+  attendance: 100,
+  attDone: 0,
+  attTotal: 0,
+  progress: 0,
+  progChapter: "수업 진도",
+  isLoading: true
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -40,17 +34,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderDashboard();
   setupEvents();
 
-  // 2. If student 'name' is in URL, fetch live data from Notion DB via Cloudflare Worker!
+  // 2. Fetch live data from Notion DB via Cloudflare Worker
   const params = new URLSearchParams(window.location.search);
-  const targetName = params.get("name") ? params.get("name").trim() : "";
+  const targetName = params.get("name") ? params.get("name").trim() : "조재환";
 
-  if (targetName) {
-    await fetchLiveNotionData(targetName, params);
-  } else {
-    // If no name specified in URL, try fetching the first student '조재환' so it works out of the box!
-    console.log("No ?name specified in URL, loading default student '조재환' from Notion DB...");
-    await fetchLiveNotionData("조재환", params);
-  }
+  await fetchLiveNotionData(targetName, params);
 });
 
 /**
@@ -59,7 +47,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function fetchLiveNotionData(studentName, urlParams) {
   try {
     setLoadingState(true);
-    const res = await fetch(`${WORKER_API_BASE}?name=${encodeURIComponent(studentName)}&_t=${Date.now()}`, { cache: "no-store" });
+    // 캐시 방지 파라미터 & no-store 헤더로 실시간 데이터 보장
+    const res = await fetch(`${WORKER_API_BASE}?name=${encodeURIComponent(studentName)}&_t=${Date.now()}`, {
+      cache: "no-store",
+      headers: { "Cache-Control": "no-cache", "Pragma": "no-cache" }
+    });
     const json = await res.json();
 
     if (json.success && json.data) {
@@ -76,32 +68,25 @@ async function fetchLiveNotionData(studentName, urlParams) {
       state.cumulativeTotal = live.cumulativeTotal;
       state.targetReward = live.targetReward;
       state.reward = live.reward;
-      state.isLiveSync = true;
 
-      if (Array.isArray(live.tasks) && live.tasks.length > 0) {
-        state.tasks = live.tasks;
-      }
+      // 최근 수업에 연결된 실제 집숙제 목록
+      state.tasks = Array.isArray(live.tasks) ? live.tasks : [];
 
-      // Allow URL overrides if explicitly provided
+      // URL 파라미터로 명시적 오버라이드한 값이 있으면 반영
       if (urlParams.has("reward")) state.reward = parseInt(urlParams.get("reward"), 10) || state.reward;
       if (urlParams.has("target")) state.targetReward = parseInt(urlParams.get("target"), 10) || state.targetReward;
       if (urlParams.has("streak")) state.streak = parseInt(urlParams.get("streak"), 10) || state.streak;
       if (urlParams.has("att")) state.attendance = parseInt(urlParams.get("att"), 10) || state.attendance;
       if (urlParams.has("prog")) state.progress = parseInt(urlParams.get("prog"), 10) || state.progress;
       if (urlParams.has("chapter")) state.progChapter = urlParams.get("chapter");
-
-      renderDashboard();
     } else {
       console.warn("Notion data notice:", json.error);
-      state.isLiveSync = false;
-      renderDashboard();
     }
   } catch (err) {
     console.error("Failed to connect to Notion backend:", err);
-    state.isLiveSync = false;
-    renderDashboard();
   } finally {
     setLoadingState(false);
+    renderDashboard();
   }
 }
 
@@ -133,56 +118,40 @@ function parseUrlParams() {
   if (params.has("prog")) state.progress = parseInt(params.get("prog"), 10) || state.progress;
   if (params.has("chapter")) state.progChapter = params.get("chapter");
   if (params.has("cRate")) state.cumulativeRate = parseInt(params.get("cRate"), 10) || state.cumulativeRate;
-
-  if (params.has("tasks")) {
-    const rawTasks = params.get("tasks").split(",");
-    state.tasks = rawTasks.map((t, idx) => {
-      const parts = t.trim().split(":");
-      const isDone = parts.length > 1 ? parts[1] === "1" || parts[1] === "true" : false;
-      return { id: `param-${idx + 1}`, text: parts[0].trim(), done: isDone };
-    });
-  }
 }
 
 /**
  * 3. Render Full Dashboard UI
  */
 function renderDashboard() {
-  // Update Student Name Tag & Live Sync Badge
+  // Line 1: Student Name Tag & Streak
   const studentTag = document.getElementById("studentNameTag");
   if (studentTag) {
     studentTag.textContent = `🧑‍🎓 ${state.name}`;
   }
 
-  const syncBadge = document.getElementById("syncStatusBadge");
-  if (syncBadge) {
-    if (state.isLiveSync) {
-      syncBadge.textContent = "🟢 Notion DB 실시간 연동";
-      syncBadge.className = "badge-pill pill-sync";
-    } else {
-      syncBadge.textContent = "⚡ 데모 모드";
-      syncBadge.className = "badge-pill";
-    }
+  const pillStreak = document.getElementById("pillStreak");
+  if (pillStreak) {
+    pillStreak.textContent = `🔥 ${state.streak}회 연속 완수`;
   }
 
-  // Row 1: Voucher Amounts & Progress
+  // Line 2: Amounts
   const curFormatted = `₩${state.reward.toLocaleString()}`;
   const targetFormatted = `₩${state.targetReward.toLocaleString()}`;
 
   document.getElementById("rewardCurrentText").textContent = curFormatted;
   document.getElementById("rewardTargetText").textContent = targetFormatted;
-  document.getElementById("pillCurrent").textContent = curFormatted;
-  document.getElementById("pillTarget").textContent = targetFormatted;
-  document.getElementById("pillStreak").textContent = `🔥 ${state.streak}회 연속 완수`;
 
-  const rewardPct = Math.min(100, Math.round((state.reward / state.targetReward) * 100));
+  const rewardPct = state.targetReward > 0 
+    ? Math.min(100, Math.round((state.reward / state.targetReward) * 100)) 
+    : 0;
   document.getElementById("voucherBarFill").style.width = `${rewardPct}%`;
   document.getElementById("voucherPercentText").textContent = `${rewardPct}%`;
 
   // Row 2: Checklist & Inspection Banner
   renderChecklist();
 
-  // Row 3: Circular Ring Gauges
+  // Row 3: Circular Ring Gauges (숙제, 출석률, 진도)
   renderGauges();
 
   // Update Lucide Icons
@@ -197,6 +166,20 @@ function renderDashboard() {
 function renderChecklist() {
   const container = document.getElementById("taskList");
   container.innerHTML = "";
+
+  // 로딩 중이고 아직 숙제가 안 들어왔을 때
+  if (state.isLoading && state.tasks.length === 0) {
+    container.innerHTML = '<div class="task-loading-placeholder">오늘의 숙제를 불러오는 중입니다... ⏳</div>';
+    return;
+  }
+
+  // 로딩 끝났는데 숙제가 없을 때
+  if (!state.isLoading && state.tasks.length === 0) {
+    container.innerHTML = '<div class="task-loading-placeholder">최근 수업에 부여된 집숙제가 없습니다 🎉</div>';
+    updateInspectionBanner();
+    updateHomeworkGauge();
+    return;
+  }
 
   state.tasks.forEach((task, index) => {
     const itemEl = document.createElement("div");
@@ -216,6 +199,7 @@ function renderChecklist() {
       </span>
     `;
 
+    // 학생 체크 클릭 이벤트 (로컬 화면에서만 토글되고 노션 DB는 건드리지 않음!)
     itemEl.addEventListener("click", () => {
       toggleTask(task.id);
     });
@@ -228,34 +212,20 @@ function renderChecklist() {
 }
 
 /**
- * 5. Toggle Task State & Sync with Notion DB!
+ * 5. Toggle Task State (로컬 전용 토글 - 노션 실시간 연동 제거)
  */
-async function toggleTask(taskId) {
+function toggleTask(taskId) {
   const task = state.tasks.find(t => t.id === taskId);
   if (!task) return;
 
-  // 1. Optimistic local update
+  // 로컬 체크 상태 토글
   task.done = !task.done;
   renderChecklist();
 
-  // Check celebration
+  // 모든 과제 완료 시 축하 폭죽 효과
   const allDone = state.tasks.length > 0 && state.tasks.every(t => t.done);
   if (allDone) {
     triggerConfetti();
-  }
-
-  // 2. Real-time Notion DB Update via Cloudflare Worker
-  if (taskId && !String(taskId).startsWith("mock-") && !String(taskId).startsWith("param-")) {
-    try {
-      await fetch(`${WORKER_API_BASE}/toggle-task`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ taskId: task.id, done: task.done })
-      });
-      console.log(`Synced task ${taskId} with Notion DB: done = ${task.done}`);
-    } catch (err) {
-      console.warn("Failed to sync toggle with Notion DB:", err);
-    }
   }
 }
 
@@ -271,7 +241,7 @@ function updateInspectionBanner() {
 
   if (allDone) {
     emoji.textContent = "🎉";
-    title.textContent = "오늘 과제 100% 자가완료!";
+    title.textContent = "오늘 과제 100% 완료!";
     sub.innerHTML = `선생님께 검사받고 100원을 적립하세요! <span class="badge-waiting">[검사 대기중 ⏳]</span>`;
     banner.style.borderColor = "#eab308";
     banner.style.background = "rgba(36, 28, 12, 0.85)";
@@ -285,18 +255,18 @@ function updateInspectionBanner() {
 }
 
 /**
- * 7. Render Circular Ring Gauges
+ * 7. Render Circular Ring Gauges (숙제, 출석률, 진도)
  */
 function renderGauges() {
   updateHomeworkGauge();
 
-  // Attendance
+  // 출석률 (Attendance)
   const attOffset = CIRCUMFERENCE - (state.attendance / 100) * CIRCUMFERENCE;
   document.getElementById("ringAttFill").style.strokeDashoffset = attOffset;
   document.getElementById("attRateText").innerHTML = `${state.attendance}% (<span class="flame-badge">🔥${state.streak}회 연속</span>)`;
   document.getElementById("attDetailText").textContent = `출석 ${state.attDone}회 / 총 ${state.attTotal}회`;
 
-  // Progress
+  // 진도 (Progress)
   const progOffset = CIRCUMFERENCE - (state.progress / 100) * CIRCUMFERENCE;
   document.getElementById("ringProgFill").style.strokeDashoffset = progOffset;
   document.getElementById("progRateText").innerHTML = `${state.progress}% (<span id="progChapterText">${state.progChapter}</span>)`;

@@ -12,7 +12,7 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <link rel="stylesheet" href="style.css?v=4.0">
+  <link rel="stylesheet" href="style.css?v=5.0">
 </head>
 <body>
   <div class="dashboard-card" id="dashboardWidget">
@@ -23,31 +23,31 @@
 
     <!-- ROW 1: Convenience Store Mobile Voucher Header & Progress -->
     <div class="voucher-section">
-      <div class="voucher-header">
+      <!-- Line 1: Student Name Tag & Streak Badge -->
+      <div class="header-line-student">
+        <span class="student-name-tag" id="studentNameTag">🧑‍🎓 학생 로딩 중...</span>
+        <span class="badge-pill pill-streak" id="pillStreak">🔥 0회 연속 완수</span>
+      </div>
+
+      <!-- Line 2: Convenience Store Voucher Title & Points (Current / Target) -->
+      <div class="header-line-voucher">
         <div class="voucher-title-wrap">
           <span class="voucher-icon">🏪</span>
-          <span class="student-name-tag" id="studentNameTag">🧑‍🎓 김철수</span>
           <span class="voucher-name">편의점 모바일 상품권</span>
-          <span class="voucher-amounts">
-            <span class="cur-reward" id="rewardCurrentText">₩3,400</span>
-            <span class="slash">/</span>
-            <span class="target-reward" id="rewardTargetText">₩5,000</span>
-          </span>
         </div>
-        <div class="voucher-tags">
-          <span class="badge-pill pill-sync" id="syncStatusBadge">⚡ Notion DB 연동</span>
-          <span class="badge-pill pill-gold" id="pillCurrent">₩3,400</span>
-          <span class="badge-pill pill-blue" id="pillTarget">₩5,000</span>
-          <span class="badge-pill pill-streak" id="pillStreak">🔥 7회 연속 완수</span>
+        <div class="voucher-amounts">
+          <span class="cur-reward" id="rewardCurrentText">₩0</span>
+          <span class="slash">/</span>
+          <span class="target-reward" id="rewardTargetText">₩5,000</span>
         </div>
       </div>
 
       <!-- Glowing Gradient Progress Bar -->
       <div class="voucher-bar-row">
         <div class="voucher-bar-track">
-          <div class="voucher-bar-fill" id="voucherBarFill" style="width: 68%;"></div>
+          <div class="voucher-bar-fill" id="voucherBarFill" style="width: 0%;"></div>
         </div>
-        <span class="voucher-percent-label" id="voucherPercentText">68%</span>
+        <span class="voucher-percent-label" id="voucherPercentText">0%</span>
       </div>
     </div>
 
@@ -58,10 +58,9 @@
         <div class="checklist-header">
           <span class="checklist-icon">📝</span>
           <h2 class="checklist-title">오늘의 집숙제 체크리스트</h2>
-          <span class="checklist-hint" id="checklistHint">(체크 시 노션 DB 실시간 반영)</span>
         </div>
         <div class="task-list" id="taskList">
-          <!-- Dynamically Rendered by JS -->
+          <div class="task-loading-placeholder">오늘의 숙제를 불러오는 중입니다... ⏳</div>
         </div>
       </div>
 
@@ -69,7 +68,7 @@
       <div class="inspection-col">
         <div class="inspection-banner" id="inspectionBanner">
           <div class="banner-emoji" id="bannerEmoji">🎉</div>
-          <div class="banner-title" id="bannerTitle">오늘 과제 100% 자가완료!</div>
+          <div class="banner-title" id="bannerTitle">오늘 과제 100% 완료!</div>
           <div class="banner-sub" id="bannerSub">
             선생님께 검사받고 100원을 적립하세요! <span class="badge-waiting">[검사 대기중 ⏳]</span>
           </div>
@@ -77,9 +76,9 @@
       </div>
     </div>
 
-    <!-- ROW 3: Three Circular Ring Gauges (Homework, Attendance, Progress) -->
+    <!-- ROW 3: Three Circular Ring Gauges (숙제, 출석률, 진도) -->
     <div class="gauges-section">
-      <!-- Gauge 1: Homework -->
+      <!-- Gauge 1: 숙제 (전에는 Homework) -->
       <div class="gauge-item">
         <div class="ring-wrap">
           <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
@@ -94,13 +93,13 @@
           </svg>
         </div>
         <div class="gauge-info">
-          <div class="gauge-title">Homework</div>
-          <div class="gauge-primary-val" id="hwTodayRateText">오늘 100% 완료 /</div>
-          <div class="gauge-sub-val" id="hwCumulativeText">누적 성실도 94% (17/18회)</div>
+          <div class="gauge-title">숙제</div>
+          <div class="gauge-primary-val" id="hwTodayRateText">오늘 0% 완료 /</div>
+          <div class="gauge-sub-val" id="hwCumulativeText">누적 성실도 0% (0/0회)</div>
         </div>
       </div>
 
-      <!-- Gauge 2: Attendance -->
+      <!-- Gauge 2: 출석률 (전에는 Attendance) -->
       <div class="gauge-item">
         <div class="ring-wrap">
           <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
@@ -111,17 +110,17 @@
               </linearGradient>
             </defs>
             <circle class="ring-track" cx="34" cy="34" r="28" stroke-width="6" />
-            <circle class="ring-fill ring-att" id="ringAttFill" cx="34" cy="34" r="28" stroke-width="6" stroke="url(#gradAtt)" stroke-dasharray="175.93" stroke-dashoffset="8.8" />
+            <circle class="ring-fill ring-att" id="ringAttFill" cx="34" cy="34" r="28" stroke-width="6" stroke="url(#gradAtt)" stroke-dasharray="175.93" stroke-dashoffset="0" />
           </svg>
         </div>
         <div class="gauge-info">
-          <div class="gauge-title">Attendance</div>
-          <div class="gauge-primary-val" id="attRateText">95% (<span class="flame-badge">🔥7회 연속</span>)</div>
-          <div class="gauge-sub-val" id="attDetailText">출석 19회 / 총 20회</div>
+          <div class="gauge-title">출석률</div>
+          <div class="gauge-primary-val" id="attRateText">100% (<span class="flame-badge">🔥0회 연속</span>)</div>
+          <div class="gauge-sub-val" id="attDetailText">출석 0회 / 총 0회</div>
         </div>
       </div>
 
-      <!-- Gauge 3: Progress -->
+      <!-- Gauge 3: 진도 (전에는 Progress) -->
       <div class="gauge-item">
         <div class="ring-wrap">
           <svg class="ring-svg" width="68" height="68" viewBox="0 0 68 68">
@@ -132,13 +131,13 @@
               </linearGradient>
             </defs>
             <circle class="ring-track" cx="34" cy="34" r="28" stroke-width="6" />
-            <circle class="ring-fill ring-prog" id="ringProgFill" cx="34" cy="34" r="28" stroke-width="6" stroke="url(#gradProg)" stroke-dasharray="175.93" stroke-dashoffset="49.26" />
+            <circle class="ring-fill ring-prog" id="ringProgFill" cx="34" cy="34" r="28" stroke-width="6" stroke="url(#gradProg)" stroke-dasharray="175.93" stroke-dashoffset="0" />
           </svg>
         </div>
         <div class="gauge-info">
-          <div class="gauge-title">Progress</div>
-          <div class="gauge-primary-val" id="progRateText">72% (<span id="progChapterText">Chapter 8</span>)</div>
-          <div class="gauge-sub-val">진도 목표 80% 근접!</div>
+          <div class="gauge-title">진도</div>
+          <div class="gauge-primary-val" id="progRateText">0% (<span id="progChapterText">단원</span>)</div>
+          <div class="gauge-sub-val" id="progSubText">진도 목표 달성 중!</div>
         </div>
       </div>
     </div>
@@ -150,7 +149,7 @@
       <div class="modal-header">
         <div class="modal-title-row">
           <i data-lucide="sliders" class="modal-icon"></i>
-          <h3>학생 선택 & 노션 DB 실시간 연동 URL 복사</h3>
+          <h3>학생 선택 & 노션 DB 연동 URL 복사</h3>
         </div>
         <button class="close-btn" id="closeSettingsBtn"><i data-lucide="x"></i></button>
       </div>
@@ -192,6 +191,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=4.0"></script>
+  <script src="app.js?v=5.0"></script>
 </body>
 </html>

@@ -1,291 +1,311 @@
-/* ========================================================
-   Notion Student Motivation Dashboard Widget - V2 Exact Layout
-   Dark Theme, Glowing Neon Accents, Side-by-Side Checklist & Inspection
-   ======================================================== */
+/* ===================================================
+   Notion Student Motivation Dashboard - Premium Dark
+   =================================================== */
 
 :root {
-  --bg-page: #0a0d14;
   --bg-card: #0e131f;
-  --bg-card-subtle: #141a29;
-  --border-color: rgba(59, 130, 246, 0.4);
-  --border-glow: rgba(59, 130, 246, 0.18);
+  --bg-inner: rgba(18, 25, 40, 0.75);
+  --border-glow: rgba(59, 130, 246, 0.35);
+  --border-subtle: rgba(255, 255, 255, 0.08);
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
 
   --accent-gold: #f59e0b;
-  --accent-blue: #3b82f6;
-  --accent-green: #10b981;
+  --accent-yellow: #facc15;
+  --accent-rose: #fb7185;
   --accent-pink: #ec4899;
   --accent-cyan: #06b6d4;
-
-  --gold-glow-border: #eab308;
-  --gold-glow-bg: rgba(36, 28, 12, 0.85);
-  --gold-glow-shadow: rgba(234, 179, 8, 0.4);
-
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --accent-blue: #3b82f6;
+  --accent-green: #10b981;
 }
 
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: var(--bg-page);
-  color: var(--text-primary);
-  min-height: 100vh;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+  background-color: transparent;
+  color: var(--text-main);
+  padding: 8px;
   display: flex;
   justify-content: center;
-  align-items: center;
-  padding: 16px;
-  overflow-x: hidden;
+  align-items: flex-start;
+  min-height: 100vh;
 }
 
-/* Main Dashboard Card Container */
+/* Main Dashboard Card */
 .dashboard-card {
   width: 100%;
-  max-width: 860px;
+  max-width: 820px;
   background: var(--bg-card);
-  border: 1.5px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 0 25px var(--border-glow), 0 8px 32px rgba(0, 0, 0, 0.5);
-  padding: 24px 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+  border: 1.5px solid var(--border-glow);
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.12);
   position: relative;
+  overflow: hidden;
 }
 
-/* Discreet Settings Gear Button */
+/* Discreet Teacher Settings Gear Button */
 .settings-gear-btn {
   position: absolute;
   top: 14px;
-  right: 16px;
+  right: 14px;
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  color: var(--text-dim);
   cursor: pointer;
-  padding: 6px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: color 0.2s ease, transform 0.2s ease;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
   z-index: 10;
 }
 
 .settings-gear-btn:hover {
-  color: var(--text-primary);
-  transform: rotate(45deg);
+  color: var(--text-main);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .settings-gear-btn svg {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
 }
 
-/* ========================================================
-   ROW 1: Voucher Header & Glowing Gradient Progress Bar
-   ======================================================== */
+/* ===================================================
+   ROW 1: Voucher & Progress Header (2-Line Responsive Layout)
+   =================================================== */
 .voucher-section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  margin-bottom: 16px;
 }
 
-.voucher-header {
+/* Line 1: Student Name Tag + Streak Badge */
+.header-line-student {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding-right: 32px; /* space for gear icon */
+}
+
+.student-name-tag {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(59, 130, 246, 0.18);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  color: #93c5fd;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  letter-spacing: -0.2px;
+}
+
+.badge-pill {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.pill-streak {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+/* Line 2: Convenience Store Voucher Title + Amounts */
+.header-line-voucher {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
   flex-wrap: wrap;
-  gap: 10px;
-  padding-right: 28px; /* space for gear icon */
+  gap: 8px;
 }
 
 .voucher-title-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
+  gap: 6px;
 }
 
 .voucher-icon {
-  font-size: 18px;
+  font-size: 1.15rem;
 }
 
 .voucher-name {
-  color: #f1f5f9;
+  font-size: 0.98rem;
   font-weight: 700;
+  color: #e2e8f0;
+  letter-spacing: -0.3px;
 }
 
 .voucher-amounts {
-  display: inline-flex;
-  align-items: baseline;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.12rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
   gap: 4px;
-  margin-left: 4px;
 }
 
 .cur-reward {
-  color: #f8fafc;
-  font-weight: 700;
+  color: #facc15;
+  text-shadow: 0 0 10px rgba(250, 204, 21, 0.4);
 }
 
 .slash {
-  color: var(--text-muted);
+  color: var(--text-dim);
   font-weight: 400;
 }
 
 .target-reward {
-  color: var(--text-secondary);
-  font-weight: 500;
+  color: #38bdf8;
 }
 
-.voucher-tags {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.badge-pill {
-  padding: 3px 10px;
-  border-radius: 9999px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
-}
-
-.pill-gold {
-  background: rgba(245, 158, 11, 0.18);
-  color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.35);
-}
-
-.pill-blue {
-  background: rgba(59, 130, 246, 0.18);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.35);
-}
-
-.pill-streak {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-/* Glowing Gradient Bar Row */
+/* Glowing Rainbow Progress Bar */
 .voucher-bar-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .voucher-bar-track {
   flex: 1;
-  height: 9px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 9999px;
+  height: 10px;
+  background: rgba(30, 41, 59, 0.8);
+  border-radius: 999px;
   overflow: hidden;
   position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .voucher-bar-fill {
   height: 100%;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, #facc15 0%, #fb7185 30%, #ec4899 60%, #06b6d4 100%);
-  box-shadow: 0 0 14px rgba(236, 72, 153, 0.65), 0 0 6px rgba(6, 182, 212, 0.5);
-  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 999px;
+  background: linear-gradient(90deg, #facc15 0%, #fb7185 35%, #ec4899 70%, #06b6d4 100%);
+  box-shadow: 0 0 12px rgba(236, 72, 153, 0.6);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .voucher-percent-label {
-  font-size: 14px;
-  font-weight: 700;
-  color: #38bdf8;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #f8fafc;
   min-width: 38px;
   text-align: right;
 }
 
-/* ========================================================
-   ROW 2: Middle Section (Checklist & Golden Banner)
-   ======================================================== */
+/* ===================================================
+   ROW 2: Middle Section (2 Columns Side-by-Side)
+   =================================================== */
 .middle-section {
   display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 20px;
-  align-items: stretch;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 /* Left Column: Checklist */
 .checklist-col {
+  background: var(--bg-inner);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
 }
 
 .checklist-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  margin-bottom: 10px;
 }
 
 .checklist-icon {
-  font-size: 16px;
+  font-size: 0.95rem;
 }
 
 .checklist-title {
-  font-size: 15px;
+  font-size: 0.88rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: #e2e8f0;
+  letter-spacing: -0.3px;
 }
 
 .task-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
+}
+
+.task-loading-placeholder {
+  color: #94a3b8;
+  font-size: 0.82rem;
+  padding: 18px 10px;
+  text-align: center;
+  font-weight: 500;
+  animation: pulse 1.4s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
 }
 
 .task-item {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 4px;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   cursor: pointer;
+  transition: all 0.2s ease;
   user-select: none;
-  border-radius: var(--radius-sm);
-  transition: background 0.15s ease;
 }
 
 .task-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.task-item.is-done {
+  opacity: 0.65;
+}
+
+.task-item.is-done .task-label {
+  text-decoration: line-through;
+  color: var(--text-dim);
 }
 
 .task-checkbox {
-  width: 17px;
-  height: 17px;
-  border-radius: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 1px;
   flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
 .task-checkbox.checked {
-  background: #3b82f6;
-  border: 1px solid #3b82f6;
+  background: #10b981;
+  border: 1px solid #10b981;
   color: white;
-}
-
-.task-checkbox.checked svg {
-  width: 12px;
-  height: 12px;
 }
 
 .task-checkbox.unchecked {
@@ -293,119 +313,110 @@ body {
   border: 1.5px solid #64748b;
 }
 
-.task-label {
-  font-size: 13.5px;
-  color: #e2e8f0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
+.task-checkbox svg {
+  width: 12px;
+  height: 12px;
+  stroke-width: 3;
 }
 
-.task-item.is-done .task-label {
-  color: #64748b;
-  text-decoration: line-through;
+.task-label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #f1f5f9;
+  line-height: 1.35;
+  flex: 1;
 }
 
 .status-tag {
-  font-size: 11.5px;
-  font-weight: 600;
-  text-decoration: none !important;
   display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-left: 4px;
 }
 
 .status-tag.done {
-  color: #64748b;
+  color: #34d399;
 }
 
 .status-tag.pending {
-  color: #f59e0b;
-  font-weight: 700;
+  color: #f87171;
 }
 
-/* Right Column: Golden Glowing Inspection Banner */
+/* Right Column: Inspection Banner */
 .inspection-col {
   display: flex;
-  align-items: stretch;
 }
 
 .inspection-banner {
-  width: 100%;
-  background: var(--gold-glow-bg);
-  border: 2px solid var(--gold-glow-border);
-  border-radius: var(--radius-md);
-  box-shadow: 0 0 20px var(--gold-glow-shadow), inset 0 0 12px rgba(234, 179, 8, 0.12);
-  padding: 18px 20px;
+  flex: 1;
+  background: rgba(36, 28, 12, 0.85);
+  border: 1.5px solid #eab308;
+  border-radius: 12px;
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   text-align: center;
-  gap: 6px;
-  animation: pulseGold 3s infinite ease-in-out;
-}
-
-@keyframes pulseGold {
-  0%, 100% {
-    box-shadow: 0 0 18px rgba(234, 179, 8, 0.35), inset 0 0 10px rgba(234, 179, 8, 0.1);
-    border-color: #eab308;
-  }
-  50% {
-    box-shadow: 0 0 26px rgba(234, 179, 8, 0.55), inset 0 0 15px rgba(234, 179, 8, 0.2);
-    border-color: #fde047;
-  }
+  box-shadow: 0 0 20px rgba(234, 179, 8, 0.2);
+  transition: all 0.3s ease;
 }
 
 .banner-emoji {
-  font-size: 22px;
-  margin-bottom: 2px;
+  font-size: 1.9rem;
+  margin-bottom: 6px;
 }
 
 .banner-title {
-  font-size: 15px;
+  font-size: 0.95rem;
   font-weight: 800;
   color: #fef08a;
+  margin-bottom: 5px;
   letter-spacing: -0.2px;
 }
 
 .banner-sub {
-  font-size: 12.5px;
-  color: #f8fafc;
+  font-size: 0.8rem;
+  color: #fde047;
   line-height: 1.4;
+  font-weight: 500;
 }
 
 .badge-waiting {
-  color: #fbbf24;
+  color: #facc15;
   font-weight: 700;
-  display: inline-block;
-  margin-top: 2px;
+  margin-left: 2px;
 }
 
-/* ========================================================
-   ROW 3: Three Circular Ring Gauges
-   ======================================================== */
+/* ===================================================
+   ROW 3: Three Circular Ring Gauges (숙제, 출석률, 진도)
+   =================================================== */
 .gauges-section {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-  padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
 .gauge-item {
+  background: var(--bg-inner);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 10px 12px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
 
 .ring-wrap {
   position: relative;
-  width: 68px;
-  height: 68px;
+  width: 58px;
+  height: 58px;
   flex-shrink: 0;
 }
 
 .ring-svg {
+  width: 100%;
+  height: 100%;
   transform: rotate(-90deg);
 }
 
@@ -417,30 +428,31 @@ body {
 .ring-fill {
   fill: none;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gauge-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  min-width: 0;
 }
 
 .gauge-title {
-  font-size: 14px;
+  font-size: 0.82rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: #94a3b8;
+  margin-bottom: 2px;
+  letter-spacing: -0.2px;
 }
 
 .gauge-primary-val {
-  font-size: 12.5px;
-  font-weight: 600;
-  color: #cbd5e1;
-}
-
-.gauge-sub-val {
-  font-size: 11.5px;
-  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #f8fafc;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 1px;
 }
 
 .flame-badge {
@@ -448,129 +460,153 @@ body {
   font-weight: 700;
 }
 
-/* ========================================================
-   Settings Modal Styling
-   ======================================================== */
+.gauge-sub-val {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ===================================================
+   Modal (Teacher Student Switcher)
+   =================================================== */
 .modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(8px);
-  display: none;
-  justify-content: center;
+  backdrop-filter: blur(5px);
+  display: flex;
   align-items: center;
-  z-index: 100;
+  justify-content: center;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
   padding: 16px;
 }
 
 .modal-backdrop.show {
-  display: flex;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .modal-card {
-  background: #131927;
-  border: 1px solid rgba(59, 130, 246, 0.3);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
   width: 100%;
-  max-width: 580px;
-  max-height: 90vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  max-width: 480px;
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8);
 }
 
 .modal-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  justify-content: space-between;
+  margin-bottom: 16px;
 }
 
 .modal-title-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: #f8fafc;
-  font-size: 15px;
+  gap: 8px;
+}
+
+.modal-title-row h3 {
+  font-size: 0.95rem;
   font-weight: 700;
+  color: #f8fafc;
 }
 
 .modal-icon {
   width: 18px;
   height: 18px;
-  color: #38bdf8;
+  color: #3b82f6;
 }
 
 .close-btn {
   background: transparent;
   border: none;
-  color: var(--text-muted);
+  color: #94a3b8;
   cursor: pointer;
   padding: 4px;
 }
 
-.close-btn:hover {
-  color: white;
+.quick-student-select-box {
+  margin-bottom: 14px;
+  background: rgba(15, 23, 42, 0.6);
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.modal-body {
-  padding: 20px;
+.quick-student-select-box label {
+  display: block;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  margin-bottom: 8px;
+}
+
+.student-chips {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.input-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.input-group.full-width {
-  grid-column: span 2;
-}
-
-.input-group label {
-  font-size: 11.5px;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.input-group input {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-sm);
-  padding: 8px 10px;
-  font-size: 13px;
-  color: white;
-  outline: none;
-}
-
-.input-group input:focus {
-  border-color: #38bdf8;
-}
-
-.url-output-section {
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
-.url-output-section label {
-  font-size: 12px;
+.chip-btn {
+  background: rgba(30, 41, 59, 0.8);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chip-btn:hover {
+  background: #2563eb;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.chip-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #60a5fa;
   font-weight: 700;
-  color: #38bdf8;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.input-group input {
+  width: 100%;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: white;
+  font-size: 0.85rem;
+}
+
+.url-output-section {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.url-output-section label {
+  display: block;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-bottom: 6px;
 }
 
 .copy-box {
@@ -580,26 +616,27 @@ body {
 
 .copy-box input {
   flex: 1;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-sm);
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 8px;
   padding: 8px 10px;
-  font-size: 12px;
-  color: #cbd5e1;
+  color: #38bdf8;
+  font-size: 0.78rem;
+  font-family: monospace;
 }
 
 .copy-btn {
   background: #2563eb;
   color: white;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   padding: 8px 14px;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 0.8rem;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   white-space: nowrap;
 }
 
@@ -608,104 +645,50 @@ body {
 }
 
 .copy-hint {
-  font-size: 11.5px;
-  color: var(--text-muted);
-}
-
-.copy-hint code {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px 4px;
-  border-radius: 4px;
-  color: #f59e0b;
-}
-
-/* ========================================================
-   Responsive Breakpoints
-   ======================================================== */
-@media (max-width: 720px) {
-  .middle-section {
-    grid-template-columns: 1fr;
-  }
-
-  .gauges-section {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .input-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .input-group.full-width {
-    grid-column: span 1;
-  }
-}
-
-/* Student Name Tag on Card Header */
-.student-name-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(59, 130, 246, 0.2);
-  border: 1px solid rgba(59, 130, 246, 0.5);
-  color: #93c5fd;
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 6px;
-  margin-right: 4px;
-}
-
-.pill-sync {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border: 1px solid rgba(16, 185, 129, 0.4);
-}
-
-.checklist-hint {
   font-size: 0.72rem;
   color: #94a3b8;
-  font-weight: 500;
-  margin-left: auto;
+  margin-top: 6px;
 }
 
-/* Quick Student Chips */
-.quick-student-select-box {
-  margin-bottom: 16px;
-  background: rgba(15, 23, 42, 0.6);
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-.quick-student-select-box label {
-  display: block;
-  font-size: 0.8rem;
-  color: #cbd5e1;
-  margin-bottom: 8px;
-}
-.student-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-.chip-btn {
-  background: rgba(30, 41, 59, 0.8);
-  color: #e2e8f0;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  padding: 5px 10px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.chip-btn:hover {
-  background: #2563eb;
-  color: white;
-  border-color: #3b82f6;
-}
-.chip-btn.active {
-  background: #3b82f6;
-  color: white;
-  border-color: #60a5fa;
-  font-weight: 700;
+/* ===================================================
+   Mobile Responsiveness (휴대폰 최적화)
+   =================================================== */
+@media (max-width: 640px) {
+  body {
+    padding: 4px;
+  }
+
+  .dashboard-card {
+    padding: 12px 14px;
+    border-radius: 14px;
+  }
+
+  /* 2단: 체크리스트와 배너를 세로로 깔끔하게 배치 */
+  .middle-section {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* 3단: 게이지 3개를 세로 스택 또는 콤팩트 배치 */
+  .gauges-section {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .gauge-item {
+    padding: 8px 10px;
+  }
+
+  .ring-wrap {
+    width: 50px;
+    height: 50px;
+  }
+
+  .voucher-amounts {
+    font-size: 1.05rem;
+  }
+
+  .header-line-voucher {
+    margin-bottom: 6px;
+  }
 }
