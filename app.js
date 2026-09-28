@@ -43,19 +43,27 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // 2. Fetch live data from Notion DB via Cloudflare Worker
   const params = new URLSearchParams(window.location.search);
-  const targetName = params.get("name") ? params.get("name").trim() : "조재환";
+  const targetId = params.get("id") ? params.get("id").trim() : null;
+  const targetName = params.get("name") ? params.get("name").trim() : (targetId ? null : "조재환");
 
-  await fetchLiveNotionData(targetName, params);
+  await fetchLiveNotionData({ id: targetId, name: targetName }, params);
 });
 
 /**
  * 1. Fetch live student data from Notion Cloudflare Worker
  */
-async function fetchLiveNotionData(studentName, urlParams) {
+async function fetchLiveNotionData(target, urlParams) {
   try {
     state.isLoading = true;
+    let query = `_t=${Date.now()}`;
+    if (target.id) {
+      query += `&id=${encodeURIComponent(target.id)}`;
+    } else if (target.name) {
+      query += `&name=${encodeURIComponent(target.name)}`;
+    }
+
     // Simple GET request with timestamp _t for zero-cache & guaranteed CORS safety
-    const res = await fetch(`${WORKER_API_BASE}?name=${encodeURIComponent(studentName)}&_t=${Date.now()}`);
+    const res = await fetch(`${WORKER_API_BASE}?${query}`);
     const json = await res.json();
 
     if (json.success && json.data) {
@@ -102,7 +110,11 @@ async function fetchLiveNotionData(studentName, urlParams) {
 function parseUrlParams() {
   const params = new URLSearchParams(window.location.search);
 
-  if (params.has("name")) state.name = params.get("name");
+  if (params.has("name")) {
+    state.name = params.get("name");
+  } else if (params.has("id")) {
+    state.name = "학생 데이터 로딩 중...";
+  }
   if (params.has("streak")) state.streak = parseInt(params.get("streak"), 10) || state.streak;
   if (params.has("hwStreak")) state.hwStreak = parseInt(params.get("hwStreak"), 10) || state.hwStreak;
   if (params.has("reward")) state.reward = parseInt(params.get("reward"), 10) || state.reward;

@@ -38,15 +38,29 @@
 ## 📝 노션(Notion)에 넣는 방법
 
 1. 학생 노션 페이지에서 `/embed` 또는 `/임베드`를 입력합니다.
-2. 배포된 주소에 학생 데이터를 덧붙여 입력합니다.
+2. 아래의 보안 링크 또는 학생 이름을 덧붙여 입력합니다.
 
-### 📌 학생별 맞춤 URL 예시:
+### 🔒 1. 친구가 절대 유추할 수 없는 보안 고유 링크 (강력 추천)
+학생 이름 대신 노션의 고유 난수 ID(UUID)를 사용하므로 친구가 주소를 때려맞힐 수 없습니다.
 ```
-https://[내아이디].github.io/notion-widget/?name=김철수&reward=3400&target=5000&streak=7&cRate=94&cDone=17&cTotal=18&att=95&prog=72&chapter=Chapter+8&tasks=쎈수학 50~55p B단계 홀수번,영어 단어 Day 3,오답노트 정리&hwDone=3
+https://turtle-6677.github.io/notion-widget-student/?id=학생노션페이지ID
+```
+> 💡 **노션 수식으로 1초 만에 자동 생성하는 팁**:  
+> 노션 **[🧑‍🎓학생 DB]**에 새 속성 ➔ **수식(Formula)**을 추가하고 아래 수식을 넣으면 전 학생의 고유 보안 링크가 자동으로 표에 생성됩니다!  
+> ```text
+> "https://turtle-6677.github.io/notion-widget-student/?id=" + id()
+> ```
+
+---
+
+### 📌 2. 이름 기반 URL (간편 모드)
+```
+https://turtle-6677.github.io/notion-widget-student/?name=학생이름
 ```
 
 ### 🔑 URL 파라미터 안내:
-* `name`: 학생 이름
+* `id`: 학생 고유 노션 페이지 ID (보안 모드 - 유추 불가 난수)
+* `name`: 학생 이름 (간편 모드)
 * `streak`: 연속 과제 달성 일수 (회)
 * `reward`: 현재 누적 금액 (원)
 * `target`: 목표 상품권 금액 (기본 5000)
